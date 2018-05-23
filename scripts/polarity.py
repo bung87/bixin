@@ -2,6 +2,8 @@
 
 import os,re
 
+import jieba.posseg as pseg
+
 DICTIONARIES_DIR = os.path.join(os.path.dirname(__file__),"..","dictionaries")
 
 DATA_DIR = os.path.join(os.path.dirname(__file__),"..","data")
@@ -19,7 +21,27 @@ neg_file = os.path.join(ntusd_dir,"NTUSD_negative_simplified.txt")
 new_line = "%s\n"
 
 def clean_word(s):
-    return re.sub('&#\d+;',"",s)
+    text = re.sub('&#\d+;',"",s.strip())
+    if text !=':)' and re.match(r'^[^\w\s]',text):
+        return None
+    # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
+    #     return None
+    words = list(pseg.cut(text))
+    
+    if len(words) == 1:
+        for _, tag in words:
+            if tag == 'm':
+                return None
+            elif tag == 'x':
+                return None
+            elif tag == 'zg':
+                return None
+            if tag.startswith('nr') or tag.startswith('ns') or tag.startswith('nt'):
+                return None
+    elif all(y == list(words[0])[1] for x,y in words):
+        return None
+
+    return text
 
 def simple_write(pos_file,neg_file,start_line=0,mode='a',pos_result=pos_result,neg_result=neg_result):
     with open(pos_file) as f,\
@@ -77,6 +99,25 @@ with open(polarity_table) as f,\
         cols = line.split("\t")
         word = clean_word(cols[0])
         if not word :
+            continue
+        polarity = float(cols[1])
+        if polarity > 0:
+            pos.write(new_line % word)
+        elif polarity < 0:
+            neg.write(new_line % word)
+
+polarity_table = os.path.join(DICTIONARIES_DIR,'BosonNLP_sentiment_score',"BosonNLP_sentiment_score.txt")
+
+with open(polarity_table) as f,\
+    open(pos_result,'a') as pos,\
+    open(neg_result,'a') as neg:
+    
+    for line in f:
+        cols = line.split(" ")
+        word = clean_word(cols[0])
+        if not word :
+            continue
+        elif  re.match('[0-9a-zA-Z：]+',word):
             continue
         polarity = float(cols[1])
         if polarity > 0:
@@ -149,3 +190,12 @@ with open(pos_merged) as pos,\
     line = "Unified neg with results to %s lines" % sum(1 for line in neg) 
     print(line)
     readme.write(new_line % line)
+
+negations_file = os.path.join(DICTIONARIES_DIR,"否定词典","否定.txt")
+
+with open(negations_file) as negations,\
+    open(os.path.join(DATA_DIR,"readme.txt"),'a') as readme:
+    negations_list = [line.strip() for line in negations.readlines()]
+    readme.write(new_line % "Negations")
+    readme.write(new_line % "=========")
+    readme.write(new_line % str(negations_list))
