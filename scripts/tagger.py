@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os,re
+import os,re,json
 
 import jieba.posseg as pseg
 
@@ -194,8 +194,10 @@ with open(pos_merged) as pos,\
 negations_file = os.path.join(DICTIONARIES_DIR,"否定词典","否定.txt")
 
 with open(negations_file) as negations,\
+    open(os.path.join(DATA_DIR,"negations.json"),'a') as j,\
     open(os.path.join(DATA_DIR,"readme.txt"),'a') as readme:
     negations_list = [line.strip() for line in negations.readlines()]
     readme.write(new_line % "Negations")
     readme.write(new_line % "=========")
     readme.write(new_line % str(negations_list))
+    json.dump(negations_list,j)
