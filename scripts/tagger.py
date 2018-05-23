@@ -61,7 +61,7 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
                 continue
             word = clean_word(line)
             if word:
-                f2.write(word)
+                f2.write(new_line % word)
 
     with open(neg_file) as f,\
             open(neg_result, mode) as f2:
@@ -73,7 +73,7 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
                 continue
             word = clean_word(line)
             if word:
-                f2.write(word)
+                f2.write(new_line % word)
 
 
 simple_write(pos_file, neg_file, mode='w')
