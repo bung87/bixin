@@ -25,7 +25,8 @@ new_line = "%s\n"
 
 
 def clean_word(s):
-    text = re.sub('&#\d+;', "", s.strip())
+    text = re.sub(r'&#\d+;', "", s.strip())
+    text = re.sub(r'[:：？。，\.#·、…]+$',"", text)
     if text != ':)' and re.match(r'^[^\w\s]', text):
         return None
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
