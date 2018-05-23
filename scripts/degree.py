@@ -29,5 +29,6 @@ with open(file_path) as f,\
         result.update({
             mark_num:l
         })
-    print(result.keys(),result)
+    print(result.keys())
+    print(result)
     json.dump(result,f2)
