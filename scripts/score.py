@@ -41,8 +41,8 @@ def get_partial_score(news, debug=False):
 
     word_list = [x for x in jieba.cut(news) if not re.match("\W", x)]
 
-    pos_dict = {'times': 0, 'score': 0, 'words': []}
-    neg_dict = {'times': 0, 'score': 0, 'words': []}
+    pos_dict = {'times': 0, 'score': 0, 'words': [],'index':[]}
+    neg_dict = {'times': 0, 'score': 0, 'words': [],'index':[]}
 
     for index, word in enumerate(word_list):
         word_score = 0
@@ -83,13 +83,36 @@ def get_partial_score(news, debug=False):
 
         if word_score > 0:
             debug and pos_dict['words'].append(word)
+            pos_dict['index'].append(index)
             pos_dict['times'] += 1
             pos_dict['score'] += word_score
         elif word_score < 0:
             debug and neg_dict['words'].append(word)
+            neg_dict['index'].append(index)
             neg_dict['times'] += 1
             neg_dict['score'] += word_score
-    return pos_dict['score'] - abs(neg_dict['score'])
+    debug and print(str(pos_dict)+"\n"+str(neg_dict))
+    
+    pos_len = pos_dict['index']
+    neg_len = neg_dict['index']
+    pos_max = max(pos_dict['index']) if pos_len else 0
+    neg_max = max(neg_dict['index']) if neg_len else 0
+
+    pos_min = min(pos_dict['index']) if pos_len else 0
+    neg_min = min(neg_dict['index']) if neg_len else 0
+
+    pos_range = pos_max - pos_min
+    neg_range = neg_max - neg_min
+    text_len = len(news)
+    pos_per = pos_range/text_len
+    neg_per = neg_range/text_len
+    
+
+    wei = abs(pos_per-neg_per) * text_len
+    pos_wei =  wei if pos_max>neg_max else 0
+    neg_wei =  wei if neg_max>pos_max else 0
+
+    return pos_dict['score']*pos_per + pos_wei - (abs(neg_dict['score']*neg_per) + neg_wei)
     # return (pos_dict, neg_dict)
 
 
@@ -108,6 +131,7 @@ if __name__ == "__main__":
         
         count = 0
         right = 0.0
+        zero = 0.0
         for file in files:
             with open(file) as f:
                 for line in f:
@@ -115,13 +139,20 @@ if __name__ == "__main__":
                     sp = re.split('\t',line,maxsplit=1)
                     flag = sp[1].strip()
                     r = get_partial_score(sp[0])
-                    print(sp[0])
-                    print(flag,r)
+                    
+                    if r == 0:
+                        zero+=1
+                        continue
                     if flag == "p" and r>0:
                         right +=1
                     elif flag == "n" and r<0:
                         right +=1
+                    else:
+                        print(sp[0])
+                        print(flag,r)
+        print("Total:%s" % count)
+        print("accuracy: %f" % (right/count) ) # 0.6248134726071201 0.629716 accuracy: 0.624813
+        print("Total Zero:%d ,percent:%f" %  (zero,zero/count) )
 
-        print(right/count) # 0.6248134726071201
 
 
