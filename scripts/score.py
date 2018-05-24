@@ -17,32 +17,38 @@ most_degree = very_degree = more_degree = ish_degree = least_degree = []
 
 neg_degree = []
 
-negations = json.load(open(os.path.join(DATA_DIR, 'negations.json')))
+negations = set(json.load(open(os.path.join(DATA_DIR, 'negations.json'))))
 
 with open(os.path.join(DATA_DIR, "degrees.json")) as f:
     d = json.load(f)
-    most_degree = d.get("1")
-    very_degree = d.get("2")
-    more_degree = d.get("3")
-    ish_degree = d.get("4")
-    least_degree = d.get("5")
-    neg_degree = d.get("6") + negations
+    most_degree = set(d.get("1"))
+    very_degree = set(d.get("2"))
+    more_degree = set(d.get("3"))
+    ish_degree = set(d.get("4"))
+    least_degree = set(d.get("5"))
+    neg_degree = set(d.get("6")).union(negations)
 
 # jieba.load_userdict(pos_emotion + pos_emotion)
 
 with open(os.path.join(DATA_DIR, 'pos.txt')) as f:
-    pos_emotion = [x.strip() for x in f.readlines()]
+    pos_emotion = set([x.strip() for x in f.readlines()])
 
 with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
-    neg_emotion = [x.strip() for x in f.readlines()]
+    neg_emotion = set([x.strip() for x in f.readlines()])
+
+# with open(os.path.join(DATA_DIR, 'pos_eva.txt')) as f:
+#     pos_envalute = [x.strip() for x in f.readlines()]
+
+# with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
+#     neg_envalute = [x.strip() for x in f.readlines()]
 
 
 def get_partial_score(news, debug=False):
 
     word_list = [x for x in jieba.cut(news) if not re.match("\W", x)]
 
-    pos_dict = {'times': 0, 'score': 0, 'words': [],'index':[]}
-    neg_dict = {'times': 0, 'score': 0, 'words': [],'index':[]}
+    pos_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
+    neg_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
 
     for index, word in enumerate(word_list):
         word_score = 0
@@ -70,15 +76,16 @@ def get_partial_score(news, debug=False):
         # 判断程度词
         if index - 1 >= 0:
             # 赫夫曼二叉树，加权路径最小
-            if word_list[index - 1] in more_degree or (index - 2 >= 0 and word_list[index - 2] in more_degree):
+            con = (index - 2 >= 0 and word_list[index - 2] in more_degree)
+            if word_list[index - 1] in more_degree or con:
                 word_score = 0.25 * (word_score + 3)
-            elif word_list[index - 1] in ish_degree or (index - 2 >= 0 and word_list[index - 2] in more_degree):
+            elif word_list[index - 1] in ish_degree or con:
                 word_score = 0.25 * (word_score + 2)
-            elif word_list[index - 1] in very_degree or (index - 2 >= 0 and word_list[index - 2] in more_degree):
+            elif word_list[index - 1] in very_degree or con:
                 word_score = 0.25 * (word_score + 4)
-            elif word_list[index - 1] in least_degree or (index - 2 >= 0 and word_list[index - 2] in more_degree):
+            elif word_list[index - 1] in least_degree or con:
                 word_score = 0.25 * (word_score + 1)
-            elif word_list[index - 1] in most_degree or (index - 2 >= 0 and word_list[index - 2] in more_degree):
+            elif word_list[index - 1] in most_degree or con:
                 word_score = 0.25 * (word_score + 5)
 
         if word_score > 0:
@@ -92,7 +99,7 @@ def get_partial_score(news, debug=False):
             neg_dict['times'] += 1
             neg_dict['score'] += word_score
     debug and print(str(pos_dict)+"\n"+str(neg_dict))
-    
+
     pos_len = pos_dict['index']
     neg_len = neg_dict['index']
     pos_max = max(pos_dict['index']) if pos_len else 0
@@ -106,11 +113,10 @@ def get_partial_score(news, debug=False):
     text_len = len(news)
     pos_per = pos_range/text_len
     neg_per = neg_range/text_len
-    
 
     wei = abs(pos_per-neg_per) * text_len
-    pos_wei =  wei if pos_max>neg_max else 0
-    neg_wei =  wei if neg_max>pos_max else 0
+    pos_wei = wei if pos_max > neg_max else 0
+    neg_wei = wei if neg_max > pos_max else 0
 
     return pos_dict['score']*pos_per + pos_wei - (abs(neg_dict['score']*neg_per) + neg_wei)
     # return (pos_dict, neg_dict)
@@ -123,12 +129,13 @@ if __name__ == "__main__":
     else:
         from os import walk
 
-        DIR = os.path.join(os.path.dirname(__file__),"..","test_data")
+        DIR = os.path.join(os.path.dirname(__file__), "..", "test_data")
         N = os.path.abspath(DIR)
         files = []
         for (dirpath, dirnames, filenames) in walk(N):
-            files.extend([ os.path.join(dirpath,x)  for x in filenames if x.endswith(".txt")])
-        
+            files.extend([os.path.join(dirpath, x)
+                          for x in filenames if x.endswith(".txt")])
+
         count = 0
         right = 0.0
         zero = 0.0
@@ -136,23 +143,21 @@ if __name__ == "__main__":
             with open(file) as f:
                 for line in f:
                     count += 1
-                    sp = re.split('\t',line,maxsplit=1)
+                    sp = re.split('\t', line, maxsplit=1)
                     flag = sp[1].strip()
                     r = get_partial_score(sp[0])
-                    
+
                     if r == 0:
-                        zero+=1
+                        zero += 1
                         continue
-                    if flag == "p" and r>0:
-                        right +=1
-                    elif flag == "n" and r<0:
-                        right +=1
+                    if flag == "p" and r > 0:
+                        right += 1
+                    elif flag == "n" and r < 0:
+                        right += 1
                     else:
                         print(sp[0])
-                        print(flag,r)
+                        print(flag, r)
         print("Total:%s" % count)
-        print("accuracy: %f" % (right/count) ) # 0.6248134726071201 0.629716 accuracy: 0.624813
-        print("Total Zero:%d ,percent:%f" %  (zero,zero/count) )
-
-
-
+        # 0.6248134726071201 0.629716 accuracy: 0.624813 accuracy: 0.612663 downwith evalute list 0.624813
+        print("accuracy: %f" % (right/count))
+        print("Total Zero:%d ,percent:%f" % (zero, zero/count))

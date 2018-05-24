@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import re
 import json
 
@@ -26,7 +27,7 @@ new_line = "%s\n"
 
 def clean_word(s):
     text = re.sub(r'&#\d+;', "", s.strip())
-    text = re.sub(r'[:：？。，\.#·、…]+$',"", text)
+    text = re.sub(r'[:：？。，\.#·、…]+$', "", text)
     if text != ':)' and re.match(r'^[^\w\s]', text):
         return None
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
@@ -75,6 +76,24 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
             word = clean_word(line)
             if word:
                 f2.write(new_line % word)
+
+
+#
+if len(sys.argv) == 2:
+
+    pos_result = os.path.join(DATA_DIR, "pos_eva.txt")
+
+    neg_result = os.path.join(DATA_DIR, "neg_eva.txt")
+
+    hownet_dir = os.path.join(DICTIONARIES_DIR, "知网Hownet情感词典")
+
+    pos_file = os.path.join(hownet_dir, "正面评价词语（中文）.txt")
+
+    neg_file = os.path.join(hownet_dir, "负面评价词语（中文）.txt")
+
+    simple_write(pos_file, neg_file, start_line=3, mode='w',
+                 pos_result=pos_result, neg_result=neg_result)
+    exit()
 
 
 simple_write(pos_file, neg_file, mode='w')
@@ -155,6 +174,7 @@ pos_file = os.path.join(hownet_dir, "正面情感词语（中文）.txt")
 neg_file = os.path.join(hownet_dir, "负面情感词语（中文）.txt")
 
 simple_write(pos_file, neg_file, start_line=3, mode='a')
+
 
 polarity_table = os.path.join(DICTIONARIES_DIR, '褒贬词及其近义词', "褒贬词及其近义词.csv")
 
