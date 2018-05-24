@@ -1,7 +1,7 @@
-Combined pos with results to 33024 lines
-Combined neg with results to 31168 lines
-Unified pos with results to 23601 lines
-Unified neg with results to 21804 lines
+Combined pos with results to 31711 lines
+Combined neg with results to 30482 lines
+Unified pos with results to 22658 lines
+Unified neg with results to 21252 lines
 Negations
 =========
 ['否定', '非', '不', '别', '甭', '未', '莫', '勿', '白', '忌', '弗', '否', '休', '没', '没有', '不要', '不是', '不用', '不必', '不曾', '白搭', '无须', '并非', '毫无', '决不', '休想', '永不', '未尝', '从不', '从未', '未必', '未曾', '未能', '难以', '尚未', '从没', '绝非', '远非', '切莫', '切勿', '禁止', '拒绝', '杜绝', '弗有', '休要', '木有', '白白', '否定', '否认', '否决', '抹煞', '抹杀', '抹掉', '一无所获', '无用', '勿用', '不及', '不如']
