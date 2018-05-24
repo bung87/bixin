@@ -44,7 +44,8 @@ with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
 
 
 def get_partial_score(news, debug=False):
-
+    news = re.sub(
+        r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', news)
     word_list = [x for x in jieba.cut(news) if not re.match("\W", x)]
 
     pos_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
@@ -114,9 +115,9 @@ def get_partial_score(news, debug=False):
     pos_per = pos_range/text_len
     neg_per = neg_range/text_len
 
-    wei = abs(pos_per-neg_per) * text_len
-    pos_wei = wei if pos_max > neg_max else 0
-    neg_wei = wei if neg_max > pos_max else 0
+    wei = abs(pos_per-neg_per) / text_len
+    pos_wei = wei if pos_max > neg_max and pos_per > 0.1 else 0
+    neg_wei = wei if neg_max > pos_max and neg_per > 0.1 else 0
 
     return pos_dict['score']*pos_per + pos_wei - (abs(neg_dict['score']*neg_per) + neg_wei)
     # return (pos_dict, neg_dict)

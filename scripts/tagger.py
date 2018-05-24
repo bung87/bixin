@@ -25,6 +25,28 @@ neg_file = os.path.join(ntusd_dir, "NTUSD_negative_simplified.txt")
 new_line = "%s\n"
 
 
+def common_igrnoe(tag):
+    if tag.startswith('u'):  # u 助词
+        return None
+    if tag == "d":  # d 副词
+        return None
+    elif tag == "r":  # 代词
+        return None
+    elif tag.startswith('c'):  # c 连词
+        return None
+    elif tag == "p":  # 介词
+        return None
+    elif tag == 'm':
+        return None
+    elif tag == 's':  # 处所词
+        return None
+    elif tag.startswith('x'):  # x 字符串 xx 非语素字 xu 网址URL
+        return None
+    elif tag == 'zg':
+        return None
+    return True
+
+
 def clean_word(s):
     text = re.sub(r'&#\d+;', "", s.strip())
     text = re.sub(r'[:：？。，\.#·、…]+$', "", text)
@@ -38,15 +60,9 @@ def clean_word(s):
         for _, tag in words:
             if tag == "n":
                 return None
-            if tag == 'm':
-                return None
-            elif tag == 's':
-                return None
-            elif tag == 'x':
-                return None
-            elif tag == 'zg':
-                return None
             if tag.startswith('nr') or tag.startswith('ns') or tag.startswith('nt') or tag.startswith('nz'):
+                return None
+            if not common_igrnoe(tag):
                 return None
     elif all(y == list(words[0])[1] for x, y in words):
         return None
@@ -159,6 +175,45 @@ with open(polarity_table) as f,\
             pos.write(new_line % word)
         elif polarity < 0:
             neg.write(new_line % word)
+
+# 短语
+
+
+def multi_write(words, result, sentence_file):
+    if len(words) == 1:
+        for x, tag in words:
+            word = clean_word(x)
+            if not word:
+                continue
+            result.write(new_line % word)
+    else:
+        sentence_file.write(new_line % "".join([x for x, i in words]))
+
+
+polarity_table = os.path.join(
+    DICTIONARIES_DIR, '情感词典及其分类', "情感词典及其分类_csv", "Sheet2-Table 1.csv")
+
+pos_sentence = os.path.join(DATA_DIR, "pos_sentence.txt")
+
+neg_sentence = os.path.join(DATA_DIR, "neg_sentence.txt")
+
+with open(polarity_table) as f,\
+        open(pos_result, 'a') as pos,\
+        open(neg_result, 'a') as neg,\
+        open(pos_sentence, 'w') as pos_sentence,\
+        open(neg_sentence, 'w') as neg_sentence:
+
+    next(f)
+    for line in f:
+        cols = line.split(",")
+        pos_sent = cols[1]
+        neg_sent = cols[0]
+
+        pos_words = list(pseg.cut(pos_sent)) if pos_sent else None
+        neg_words = list(pseg.cut(neg_sent)) if neg_sent else None
+
+        pos_words and multi_write(pos_words, pos, pos_sentence)
+        neg_words and multi_write(neg_words, neg, neg_sentence)
 
 tsinghua_dir = os.path.join(DICTIONARIES_DIR, "清华大学李军中文褒贬义词典")
 
