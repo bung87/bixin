@@ -28,7 +28,6 @@ with open(os.path.join(DATA_DIR, "degrees.json")) as f:
     least_degree = set(d.get("5"))
     neg_degree = set(d.get("6")).union(negations)
 
-# jieba.load_userdict(pos_emotion + pos_emotion)
 
 with open(os.path.join(DATA_DIR, 'pos.txt')) as f:
     pos_emotion = set([x.strip() for x in f.readlines()])
@@ -37,10 +36,21 @@ with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
     neg_emotion = set([x.strip() for x in f.readlines()])
 
 # with open(os.path.join(DATA_DIR, 'pos_eva.txt')) as f:
-#     pos_envalute = [x.strip() for x in f.readlines()]
+#     pos_envalute = set([x.strip() for x in f.readlines()])
 
 # with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
-#     neg_envalute = [x.strip() for x in f.readlines()]
+#     neg_envalute = set([x.strip() for x in f.readlines()])
+
+# jieba.load_userdict()
+with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
+        open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
+    s1 = set([x.strip() for x in f1.readlines()])
+    s2 = set([x.strip() for x in f2.readlines()])
+    pos_emotion.union(s1)
+    neg_emotion.union(s2)
+    pos_neg = pos_emotion.union(neg_emotion)
+    # pos_neg_eva = pos_envalute.union(neg_envalute)
+    jieba.load_userdict(s1.union(s2).union(pos_neg))
 
 
 def get_partial_score(news, debug=False):
