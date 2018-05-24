@@ -108,7 +108,7 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
 
 
 #
-if len(sys.argv) == 2:
+if len(sys.argv) == 2 and sys.argv[1] == "eva":
 
     pos_result = os.path.join(DATA_DIR, "pos_eva.txt")
 
@@ -124,6 +124,18 @@ if len(sys.argv) == 2:
                  pos_result=pos_result, neg_result=neg_result)
     exit()
 
+if len(sys.argv) == 2 and sys.argv[1] == "neg":
+    negations_file = os.path.join(DICTIONARIES_DIR, "否定词典", "否定.txt")
+
+    with open(negations_file) as negations,\
+            open(os.path.join(DATA_DIR, "negations.json"), 'w') as j,\
+            open(os.path.join(DATA_DIR, "readme.txt"), 'a') as readme:
+        negations_list = [line.strip() for line in negations.readlines()]
+        readme.write(new_line % "Negations")
+        readme.write(new_line % "=========")
+        readme.write(new_line % str(negations_list))
+        json.dump(negations_list, j)
+    exit()
 
 simple_write(pos_file, neg_file, mode='w')
 
@@ -180,7 +192,7 @@ with open(polarity_table) as f,\
         elif re.match('[0-9a-zA-Z：:]+', word):
             continue
         polarity = float(cols[1])
-        if polarity > -1.25: # 忽略大量社交媒体热词高频词
+        if polarity > -1.25:  # 忽略大量社交媒体热词高频词
             break
         # if polarity > 0:
         #     pos.write(new_line % word)
@@ -292,14 +304,3 @@ with open(pos_merged) as pos,\
     line = "Unified neg with results to %s lines" % sum(1 for line in neg)
     print(line)
     readme.write(new_line % line)
-
-negations_file = os.path.join(DICTIONARIES_DIR, "否定词典", "否定.txt")
-
-with open(negations_file) as negations,\
-        open(os.path.join(DATA_DIR, "negations.json"), 'w') as j,\
-        open(os.path.join(DATA_DIR, "readme.txt"), 'a') as readme:
-    negations_list = [line.strip() for line in negations.readlines()]
-    readme.write(new_line % "Negations")
-    readme.write(new_line % "=========")
-    readme.write(new_line % str(negations_list))
-    json.dump(negations_list, j)
