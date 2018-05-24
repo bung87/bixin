@@ -36,6 +36,8 @@ def clean_word(s):
 
     if len(words) == 1:
         for _, tag in words:
+            if tag == "n":
+                return None
             if tag == 'm':
                 return None
             elif tag == 's':
