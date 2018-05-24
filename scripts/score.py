@@ -40,8 +40,7 @@ with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
 def get_partial_score(news, debug=False):
 
     word_list = [x for x in jieba.cut(news) if not re.match("\W", x)]
-    print(word_list)
-    print('*' * 8)
+
     pos_dict = {'times': 0, 'score': 0, 'words': []}
     neg_dict = {'times': 0, 'score': 0, 'words': []}
 
@@ -83,7 +82,6 @@ def get_partial_score(news, debug=False):
                 word_score = 0.25 * (word_score + 5)
 
         if word_score > 0:
-            # print(word,index)
             debug and pos_dict['words'].append(word)
             pos_dict['times'] += 1
             pos_dict['score'] += word_score
@@ -91,10 +89,39 @@ def get_partial_score(news, debug=False):
             debug and neg_dict['words'].append(word)
             neg_dict['times'] += 1
             neg_dict['score'] += word_score
-
-    return (pos_dict, neg_dict)
+    return pos_dict['score'] - abs(neg_dict['score'])
+    # return (pos_dict, neg_dict)
 
 
 if __name__ == "__main__":
-    p, n = get_partial_score(sys.argv[1], debug=True)
-    print(p, n)
+    if len(sys.argv) > 1:
+        flag = get_partial_score(sys.argv[1], debug=True)
+        print(flag)
+    else:
+        from os import walk
+
+        DIR = os.path.join(os.path.dirname(__file__),"..","test_data")
+        N = os.path.abspath(DIR)
+        files = []
+        for (dirpath, dirnames, filenames) in walk(N):
+            files.extend([ os.path.join(dirpath,x)  for x in filenames if x.endswith(".txt")])
+        
+        count = 0
+        right = 0.0
+        for file in files:
+            with open(file) as f:
+                for line in f:
+                    count += 1
+                    sp = re.split('\t',line,maxsplit=1)
+                    flag = sp[1].strip()
+                    r = get_partial_score(sp[0])
+                    print(sp[0])
+                    print(flag,r)
+                    if flag == "p" and r>0:
+                        right +=1
+                    elif flag == "n" and r<0:
+                        right +=1
+
+        print(right/count) # 0.6248134726071201
+
+
