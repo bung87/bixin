@@ -69,7 +69,7 @@ def clean_word(s):
 
     if len(words) == 1:
         for word, tag in words:
-            if tag == "n":
+            if tag == "n" and len(word) == 1:
                 return None
             if tag.startswith('nr') or tag.startswith('ns') or tag.startswith('nt') or tag.startswith('nz'):
                 return None
@@ -145,47 +145,47 @@ with open(hontai_file) as f,\
             neg.write(new_line % word)
 
 
-# polarity_table = os.path.join(DICTIONARIES_DIR, '汉语情感词极值表', "汉语情感词极值表.txt")
+polarity_table = os.path.join(DICTIONARIES_DIR, '汉语情感词极值表', "汉语情感词极值表.txt")
 
-# with open(polarity_table) as f,\
-#         open(pos_result, 'a') as pos,\
-#         open(neg_result, 'a') as neg:
-#     for x in range(14):
-#         next(f)
-#     for line in f:
-#         cols = line.split("\t")
-#         word = clean_word(cols[0])
-#         if not word:
-#             continue
-#         polarity = float(cols[1])
-#         if abs(polarity) <= 0.5:
-#             continue
-#         if polarity > 0:
-#             pos.write(new_line % word)
-#         elif polarity < 0:
-#             neg.write(new_line % word)
+with open(polarity_table) as f,\
+        open(pos_result, 'a') as pos,\
+        open(neg_result, 'a') as neg:
+    for x in range(14):
+        next(f)
+    for line in f:
+        cols = line.split("\t")
+        word = clean_word(cols[0])
+        if not word:
+            continue
+        polarity = float(cols[1])
+        if abs(polarity) <= 1.5:
+            continue
+        if polarity > 0:
+            pos.write(new_line % word)
+        elif polarity < 0:
+            neg.write(new_line % word)
 
-# polarity_table = os.path.join(
-#     DICTIONARIES_DIR, 'BosonNLP_sentiment_score', "BosonNLP_sentiment_score.txt")
+polarity_table = os.path.join(
+    DICTIONARIES_DIR, 'BosonNLP_sentiment_score', "BosonNLP_sentiment_score.txt")
 
-# with open(polarity_table) as f,\
-#         open(pos_result, 'a') as pos,\
-#         open(neg_result, 'a') as neg:
+with open(polarity_table) as f,\
+        open(pos_result, 'a') as pos,\
+        open(neg_result, 'a') as neg:
 
-#     for line in f:
-#         cols = line.split(" ")
-#         word = clean_word(cols[0])
-#         if not word:
-#             continue
-#         elif re.match('[0-9a-zA-Z：:]+', word):
-#             continue
-#         polarity = float(cols[1])
-#         if abs(polarity) < 0.3 or(polarity < -0.68 and polarity > -1):
-#             continue
-#         if polarity > 0:
-#             pos.write(new_line % word)
-#         elif polarity < 0:
-#             neg.write(new_line % word)
+    for line in f:
+        cols = line.split(" ")
+        word = clean_word(cols[0])
+        if not word:
+            continue
+        elif re.match('[0-9a-zA-Z：:]+', word):
+            continue
+        polarity = float(cols[1])
+        if polarity > -1.25: # 忽略大量社交媒体热词高频词
+            break
+        # if polarity > 0:
+        #     pos.write(new_line % word)
+        # elif polarity < 0:
+        neg.write(new_line % word)
 
 # 短语
 
