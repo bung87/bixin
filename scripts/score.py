@@ -168,7 +168,13 @@ if __name__ == "__main__":
                     else:
                         print(sp[0])
                         print(flag, r)
-        print("Total:%s" % count)
+
+        print("Total :%s" % count)
+
+        print("Total Zero:%d ,percent:%f" % (zero, zero/count))
+
+        count -= zero
+        print("Total without Zero:%d ,percent:%f" % (count, zero/count))
+
         # 0.6248134726071201 0.629716 accuracy: 0.624813 accuracy: 0.612663 downwith evalute list 0.624813
         print("accuracy: %f" % (right/count))
-        print("Total Zero:%d ,percent:%f" % (zero, zero/count))
