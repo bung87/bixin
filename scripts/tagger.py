@@ -25,10 +25,13 @@ neg_file = os.path.join(ntusd_dir, "NTUSD_negative_simplified.txt")
 new_line = "%s\n"
 
 
-def common_igrnoe(tag):
+def common_igrnoe(word, tag):
+    word_len = len(word)
+    if word_len == 1:  # before accuracy: 0.663919
+        return None
     if tag.startswith('u'):  # u 助词
         return None
-    if tag == "d":  # d 副词
+    elif tag == "d" and word_len == 1:  # d 副词
         return None
     elif tag == "r":  # 代词
         return None
@@ -44,12 +47,20 @@ def common_igrnoe(tag):
         return None
     elif tag == 'zg':
         return None
+    elif tag == "f":
+        return None
+    elif tag.endswith("g"):  # 语素
+        return None
     return True
 
 
 def clean_word(s):
     text = re.sub(r'&#\d+;', "", s.strip())
     text = re.sub(r'[:：？。，\.#·、…]+$', "", text)
+    text = re.sub('\w+·\w+', "", text)
+    text = re.sub('.*\.', "", text)  # for ntusd 与..脱离
+    if not text:
+        return None
     if text != ':)' and re.match(r'^[^\w\s]', text):
         return None
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
@@ -57,12 +68,12 @@ def clean_word(s):
     words = list(pseg.cut(text))
 
     if len(words) == 1:
-        for _, tag in words:
+        for word, tag in words:
             if tag == "n":
                 return None
             if tag.startswith('nr') or tag.startswith('ns') or tag.startswith('nt') or tag.startswith('nz'):
                 return None
-            if not common_igrnoe(tag):
+            if not common_igrnoe(word, tag):
                 return None
     elif all(y == list(words[0])[1] for x, y in words):
         return None
@@ -154,27 +165,27 @@ with open(polarity_table) as f,\
         elif polarity < 0:
             neg.write(new_line % word)
 
-polarity_table = os.path.join(
-    DICTIONARIES_DIR, 'BosonNLP_sentiment_score', "BosonNLP_sentiment_score.txt")
+# polarity_table = os.path.join(
+#     DICTIONARIES_DIR, 'BosonNLP_sentiment_score', "BosonNLP_sentiment_score.txt")
 
-with open(polarity_table) as f,\
-        open(pos_result, 'a') as pos,\
-        open(neg_result, 'a') as neg:
+# with open(polarity_table) as f,\
+#         open(pos_result, 'a') as pos,\
+#         open(neg_result, 'a') as neg:
 
-    for line in f:
-        cols = line.split(" ")
-        word = clean_word(cols[0])
-        if not word:
-            continue
-        elif re.match('[0-9a-zA-Z：:]+', word):
-            continue
-        polarity = float(cols[1])
-        if abs(polarity) < 0.3:
-            continue
-        if polarity > 0:
-            pos.write(new_line % word)
-        elif polarity < 0:
-            neg.write(new_line % word)
+#     for line in f:
+#         cols = line.split(" ")
+#         word = clean_word(cols[0])
+#         if not word:
+#             continue
+#         elif re.match('[0-9a-zA-Z：:]+', word):
+#             continue
+#         polarity = float(cols[1])
+#         if abs(polarity) < 0.3 or(polarity < -0.68 and polarity > -1):
+#             continue
+#         if polarity > 0:
+#             pos.write(new_line % word)
+#         elif polarity < 0:
+#             neg.write(new_line % word)
 
 # 短语
 
