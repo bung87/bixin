@@ -41,8 +41,10 @@ with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
 
 # with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
 #     neg_envalute = set([x.strip() for x in f.readlines()])
+# jieba.enable_parallel(4)
 places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
 jieba.load_userdict(places)
+
 
 with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
         open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
@@ -63,6 +65,7 @@ def get_partial_score(news, debug=False):
     if not text_len:
         return 0
     word_list = [(x, y) for x, y in pseg.cut(news)if not re.match("\W", x)]
+
     word_scored = set()
     # print(word_list)
     pos_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
