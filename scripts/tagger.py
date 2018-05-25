@@ -4,8 +4,9 @@ import os
 import sys
 import re
 import json
-
+import jieba
 import jieba.posseg as pseg
+from prefixtree import PrefixSet
 
 DICTIONARIES_DIR = os.path.join(
     os.path.dirname(__file__), "..", "dictionaries")
@@ -24,14 +25,33 @@ neg_file = os.path.join(ntusd_dir, "NTUSD_negative_simplified.txt")
 
 new_line = "%s\n"
 
+ps = PrefixSet()
 
-def common_igrnoe(word, tag):
+places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
+
+with open(places) as f:
+    jieba.load_userdict(f)
+
+    for line in f:
+        s = line.strip().split()[0]
+        ps.add(s)
+    # print(pseg.lcut("大连"))
+    # x, y = pseg.lcut("大连")[0]
+    # assert y == "ns"
+
+
+def is_space(word):
+    l = list(ps.startswith(word))
+    return len(l)
+
+
+def common_igrnoe(word, tag, text_len):
     word_len = len(word)
     if word_len == 1:  # before accuracy: 0.663919
         return None
-    if tag.startswith('u'):  # u 助词
+    elif tag.startswith('u'):  # u 助词
         return None
-    elif tag == "d" and word_len == 1:  # d 副词
+    elif tag == "d" and text_len == 1:  # d 副词
         return None
     elif tag == "r":  # 代词
         return None
@@ -51,7 +71,13 @@ def common_igrnoe(word, tag):
         return None
     elif tag.endswith("g"):  # 语素
         return None
+    elif is_space(word):
+        return None
     return True
+
+
+stop_ns = ["安宁"]
+preserve_words = ["真爱"]  # figure out which parts ignore this is complicated
 
 
 def clean_word(s):
@@ -65,15 +91,17 @@ def clean_word(s):
         return None
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
     #     return None
+    if text in preserve_words:
+        return text
     words = list(pseg.cut(text))
-
+    text_len = len(text)
     if len(words) == 1:
         for word, tag in words:
-            if tag == "n" and len(word) == 1:
+            if tag == "n" and text_len == 1:
                 return None
-            if tag.startswith('nr') or tag.startswith('ns') or tag.startswith('nt') or tag.startswith('nz'):
+            if tag.startswith('nr') or (tag.startswith('ns') and word not in stop_ns)or tag.startswith('nt') or tag.startswith('nz'):
                 return None
-            if not common_igrnoe(word, tag):
+            if not common_igrnoe(word, tag, text_len):
                 return None
     elif all(y == list(words[0])[1] for x, y in words):
         return None
@@ -205,7 +233,7 @@ with open(polarity_table) as f,\
 def multi_write(words, result, sentence_file):
     if len(words) == 1:
         for x, tag in words:
-            word = clean_word(x)
+            word = x.strip()
             if not word:
                 continue
             result.write(new_line % word)
