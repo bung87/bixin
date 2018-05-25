@@ -40,8 +40,9 @@ with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
 
 # with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
 #     neg_envalute = set([x.strip() for x in f.readlines()])
+places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
+jieba.load_userdict(places)
 
-# jieba.load_userdict()
 with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
         open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
     s1 = set([x.strip() for x in f1.readlines()])
@@ -74,7 +75,7 @@ def get_partial_score(news, debug=False):
             '''
             if (index - 1 >= 0 and word_list[index - 1] in neg_degree) or (index - 2 >= 0 and word_list[index - 2] in neg_degree):
                 word_score = 0.25 * (word_score + (-1))
-
+            debug and print("%s pos" % word)
         elif (word in neg_emotion) or (word in neg_envalute):
             word_score -= 1
             '''
@@ -84,6 +85,7 @@ def get_partial_score(news, debug=False):
             '''
             if (index - 1 >= 0 and word_list[index - 1] in neg_degree) or (index - 2 >= 0 and word_list[index - 2] in neg_degree):
                 word_score = 0.25 * (word_score + (-1))
+            debug and print("%s neg" % word)
         # 判断程度词
         if index - 1 >= 0:
             # 赫夫曼二叉树，加权路径最小
@@ -109,6 +111,7 @@ def get_partial_score(news, debug=False):
             neg_dict['index'].append(index)
             neg_dict['times'] += 1
             neg_dict['score'] += word_score
+
     debug and print(str(pos_dict)+"\n"+str(neg_dict))
 
     pos_len = pos_dict['index']
