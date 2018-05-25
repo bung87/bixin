@@ -77,22 +77,23 @@ def common_igrnoe(word, tag, text_len):
 
 
 stop_ns = ["安宁"]
-preserve_words = ["真爱"]  # figure out which parts ignore this is complicated
+# figure out which parts ignore this is complicated
+preserve_pos_words = ["真爱",  "爱", "加油", "心系", "帅", "嗨翻天"]
+preserve_neg_words = ["毁", "莫名奇妙", "承认", "曝光"]
+stop_words = ["意味", "布展", "人家", "承认"]
 
 
 def clean_word(s):
     text = re.sub(r'&#\d+;', "", s.strip())
     text = re.sub(r'[:：？。，\.#·、…]+$', "", text)
     text = re.sub('\w+·\w+', "", text)
-    text = re.sub('.*\.', "", text)  # for ntusd 与..脱离
-    if not text:
+    text = re.sub('.*\.', "", text).strip()  # for ntusd 与..脱离
+    if not text or text in stop_words:
         return None
     if text != ':)' and re.match(r'^[^\w\s]', text):
         return None
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
     #     return None
-    if text in preserve_words:
-        return text
     words = list(pseg.cut(text))
     text_len = len(text)
     if len(words) == 1:
@@ -300,6 +301,13 @@ with open(polarity_table) as f,\
             pos.write(new_line % word)
         elif polarity == "贬义":
             neg.write(new_line % word)
+
+with open(pos_result, 'a') as pos,\
+        open(neg_result, 'a') as neg:
+    for x in preserve_pos_words:
+        pos.write(new_line % x)
+    for x in preserve_neg_words:
+        neg.write(new_line % x)
 
 with open(pos_result) as pos,\
         open(neg_result) as neg,\

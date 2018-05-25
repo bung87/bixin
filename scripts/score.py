@@ -4,6 +4,7 @@ import os
 import sys
 import re
 import jieba
+import jieba.posseg as pseg
 import json
 # some codes adapt from https://github.com/godbmw/various-codes/blob/master/DictEmotionAlgorithm/Main.py
 
@@ -57,12 +58,20 @@ with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
 def get_partial_score(news, debug=False):
     news = re.sub(
         r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', news)
-    word_list = [x for x in jieba.cut(news) if not re.match("\W", x)]
-
+    news = re.sub("@[^\s]+", "", news)
+    text_len = len(news)
+    if not text_len:
+        return 0
+    word_list = [(x, y) for x, y in pseg.cut(news)if not re.match("\W", x)]
+    word_scored = set()
+    # print(word_list)
     pos_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
     neg_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
 
-    for index, word in enumerate(word_list):
+    for index, t in enumerate(word_list):
+        word, tag = t
+        if len(word) > 1 and tag == "n" and word in word_scored:
+            continue
         word_score = 0
         # 判断极性
         if (word in pos_emotion) or (word in pos_envalute):
@@ -111,6 +120,7 @@ def get_partial_score(news, debug=False):
             neg_dict['index'].append(index)
             neg_dict['times'] += 1
             neg_dict['score'] += word_score
+        word_scored.add(word)
 
     debug and print(str(pos_dict)+"\n"+str(neg_dict))
 
@@ -124,7 +134,7 @@ def get_partial_score(news, debug=False):
 
     pos_range = pos_max - pos_min
     neg_range = neg_max - neg_min
-    text_len = len(news)
+
     pos_per = pos_range/text_len
     neg_per = neg_range/text_len
 
