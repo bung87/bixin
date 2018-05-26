@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup, find_packages
 
-install_requires = ["jieba"]
+install_requires = ["jieba_fast"]
 
 setup(
     name='bixin',
