@@ -4,8 +4,8 @@ import os
 import sys
 import re
 import json
-import jieba
-import jieba.posseg as pseg
+import jieba_fast
+import jieba_fast.posseg as pseg
 from prefixtree import PrefixSet
 
 DICTIONARIES_DIR = os.path.join(
@@ -30,7 +30,7 @@ ps = PrefixSet()
 places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
 
 with open(places) as f:
-    jieba.load_userdict(f)
+    jieba_fast.load_userdict(f)
 
     for line in f:
         s = line.strip().split()[0]

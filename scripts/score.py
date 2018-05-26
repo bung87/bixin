@@ -3,8 +3,8 @@
 import os
 import sys
 import re
-import jieba
-import jieba.posseg as pseg
+import jieba_fast
+import jieba_fast.posseg as pseg
 import json
 
 aaa = os.path.join(os.path.dirname(__file__), "..")
@@ -38,9 +38,9 @@ with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
 
 # with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
 #     neg_envalute = set([x.strip() for x in f.readlines()])
-# jieba.enable_parallel(4)
+# jieba_fast.enable_parallel(4)
 places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
-jieba.load_userdict(places)
+jieba_fast.load_userdict(places)
 
 
 with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
@@ -51,7 +51,7 @@ with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
     neg_emotion.union(s2)
     pos_neg = pos_emotion.union(neg_emotion)
     # pos_neg_eva = pos_envalute.union(neg_envalute)
-    jieba.load_userdict(s1.union(s2).union(pos_neg))
+    jieba_fast.load_userdict(s1.union(s2).union(pos_neg))
 
 
 if __name__ == "__main__":

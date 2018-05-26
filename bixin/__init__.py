@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re,os
-# import jieba.posseg as pseg
-import jieba
+# import jieba_fast.posseg as pseg
+import jieba_fast
 from functools import lru_cache
 import math
 import pickle 
@@ -56,7 +56,7 @@ class Classifier():
         if not text_len:
             return 0
         # word_list = [(x, y) for x, y in jiaba.posseg.cut(news)if not re.match("\W", x)]
-        word_list = [x  for x in jieba.cut(news)if not re.match("\W", x)]
+        word_list = [x  for x in jieba_fast.cut(news)if not re.match("\W", x)]
 
         word_scored = set()
         counter = Counter(word_list)
