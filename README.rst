@@ -34,4 +34,7 @@ Development
     ./dictionaries dictionaries from vary sources
     ./data processed dictionaries through ./scripts/tagger.py
     ./scripts/release_data.py release data to package
-    ./scripts/score.py run accuray with all .txt files under test_data directory sentence per line end with a space and a tag **n** or **p**
+    
+``./scripts/score.py``
+
+run accuray with all .txt files under test_data directory sentence per line end with a space and a tag **n** or **p**
