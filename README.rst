@@ -16,3 +16,22 @@ Usage
     #3.0364366448542537
 
 ``predict`` will load dictionary data at first time,to load it manually use ``predict.classifier.initialize()``
+
+Accuracy
+========
+Test with 4091 taged corpus mixed up with shopping comments and Sina Weibo tweets
+
+accuracy: **0.813004**
+
+Development
+===========
+
+``> pip install -e git+https://github.com/bung87/bixin``
+
+
+.. code-block::
+
+    ./dictionaries dictionaries from vary sources
+    ./data processed dictionaries through ./scripts/tagger.py
+    ./scripts/release_data.py release data to package
+    ./scripts/score.py run accuray with all .txt files under test_data directory sentence per line end with a space and a tag **n** or **p**
