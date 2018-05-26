@@ -37,4 +37,4 @@ Development
     
 ``./scripts/score.py``
 
-run accuray with all .txt files under test_data directory sentence per line end with a space and a tag **n** or **p**
+run accuray testing with all .txt files under **test_data** directory sentence per line end with a space and a tag **n** or **p**
