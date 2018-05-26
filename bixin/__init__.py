@@ -33,7 +33,7 @@ class Classifier():
         self.neg_degree = set(degrees.get("6")).union(negations)
         self.initialized = True
 
-    def _initialize2(self):
+    def initialize(self):
         data = load_data()
         pos_emotion = data["pos_emotion"]
         pos_envalute = data["pos_envalute"]
@@ -137,7 +137,7 @@ def predict(x,debug=False):
     if  predict.classifier.initialized:
         return predict.classifier.predict(x,debug=debug)
     else:
-        predict.classifier._initialize2()
+        predict.classifier.initialize()
         return predict.classifier.predict(x,debug=debug)
 
 predict.classifier = Classifier()
