@@ -51,7 +51,11 @@ class Classifier():
             r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', news)
         news = re.sub("@[^\s]+", "", news)
         news = re.sub("“[^”]+”","",news) # remove quote
-        news = re.sub("【[^】]+","",news) # remove quote
+        # news = re.sub("【[^】]+】","",news) # remove quote
+        news = re.sub("《[^》]+》","",news) # title
+        news = re.sub("#[^#]+#","",news) # topic
+        news = re.sub("分享自\s@[\w]+","",news) # speed up
+        news = re.sub("转自[\w]+","",news) # speed up
         text_len = len(news)
         if not text_len:
             return 0
@@ -74,7 +78,7 @@ class Classifier():
                 word_mark = "+" + word
                 if word_mark in word_scored:
                     continue
-                word_score += 1 + math.log(1+counter[word])
+                word_score += .1 + math.log(1+counter[word])
                 '''
                 两种情况：
                 1. 非常 不 好吃
@@ -89,7 +93,7 @@ class Classifier():
                 word_mark = "-" + word
                 if word_mark in word_scored:
                     continue
-                word_score -= ( 1 + math.log(1+counter[word]))
+                word_score -= ( .1 + math.log(1+counter[word]))
                 '''
                 1. 不是 不好
                 2. 不是 很 不好
@@ -104,25 +108,27 @@ class Classifier():
                 # 赫夫曼二叉树，加权路径最小
                 con = (index - 2 >= 0 and word_list[index - 2] in self.more_degree)
                 if word_list[index - 1] in self.more_degree or con:
-                    word_score = FIXED_PA * (word_score + 3)
+                    word_score = FIXED_PA * (word_score + .3)
                 elif word_list[index - 1] in self.ish_degree or con:
-                    word_score = FIXED_PA * (word_score + 2)
+                    word_score = FIXED_PA * (word_score + .2)
                 elif word_list[index - 1] in self.very_degree or con:
-                    word_score = FIXED_PA * (word_score + 4)
+                    word_score = FIXED_PA * (word_score + .4)
                 elif word_list[index - 1] in self.least_degree or con:
-                    word_score = FIXED_PA * (word_score + 1)
+                    word_score = FIXED_PA * (word_score + .1)
                 elif word_list[index - 1] in self.most_degree or con:
-                    word_score = FIXED_PA * (word_score + 5)
+                    word_score = FIXED_PA * (word_score + .5)
 
             if word_score > 0:
-                debug and pos_dict['words'].append(word)
-                pos_dict['index'].append(index)
-                pos_dict['times'] += 1
+                if debug:
+                    pos_dict['words'].append(word)
+                    pos_dict['index'].append(index)
+                    pos_dict['times'] += 1
                 pos_dict['score'] += word_score
             elif word_score < 0:
-                debug and neg_dict['words'].append(word)
-                neg_dict['index'].append(index)
-                neg_dict['times'] += 1
+                if debug:
+                    neg_dict['words'].append(word)
+                    neg_dict['index'].append(index)
+                    neg_dict['times'] += 1
                 neg_dict['score'] += word_score
             
 

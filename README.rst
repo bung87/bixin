@@ -21,7 +21,7 @@ Accuracy
 ========
 Test with 4091 taged corpus mixed up with shopping comments and Sina Weibo tweets
 
-accuracy: **0.801482**
+accuracy: **0.823424**
 
 Development
 ===========
