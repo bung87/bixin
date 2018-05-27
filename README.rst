@@ -27,6 +27,8 @@ Test with 6232 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets
 
 accuracy: **0.822529**
 
+**Notice**:neutral texts are all ignored.
+
 details about dataset `https://github.com/bung87/bixin/wiki <https://github.com/bung87/bixin/wiki>`_
 
 Development
