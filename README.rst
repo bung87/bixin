@@ -23,6 +23,12 @@ Test with 4091 taged corpus mixed up with shopping comments and Sina Weibo tweet
 
 accuracy: **0.842130**
 
+Test with 6232 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets 、hotel reviews 、news and financial news
+
+accuracy: **0.822529**
+
+details about dataset `https://github.com/bung87/bixin/wiki <https://github.com/bung87/bixin/wiki>`_
+
 Development
 ===========
 
