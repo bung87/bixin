@@ -9,7 +9,7 @@ import json
 
 aaa = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(aaa)
-from bixin import Classifier
+from bixin import Classifier,load_data,predict
 # some codes adapt from https://github.com/godbmw/various-codes/blob/master/DictEmotionAlgorithm/Main.py
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -55,9 +55,9 @@ with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
 
 
 if __name__ == "__main__":
-    classifier = Classifier(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations)
+    # classifier = Classifier(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations)
     if len(sys.argv) > 1:
-        flag = classifier.predict(sys.argv[1], debug=True)
+        flag = predict(sys.argv[1], debug=True)
         print(flag)
     else:
         from os import walk
@@ -78,7 +78,7 @@ if __name__ == "__main__":
                     count += 1
                     sp = re.split('\t', line, maxsplit=1)
                     flag = sp[1].strip()
-                    r = classifier.predict(sp[0])
+                    r = predict(sp[0])
 
                     if r == 0:
                         zero += 1
@@ -100,3 +100,4 @@ if __name__ == "__main__":
 
         # 0.6248134726071201 0.629716 accuracy: 0.624813 accuracy: 0.612663 downwith evalute list 0.624813
         print("accuracy: %f" % (right/count))
+        # print(load_data.cache_info())
