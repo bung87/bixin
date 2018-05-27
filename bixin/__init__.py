@@ -2,19 +2,19 @@
 import re,os
 # import jieba_fast.posseg as pseg
 import jieba_fast
-from functools import lru_cache
+# from functools import lru_cache
 import math
 import pickle 
 from collections import Counter
 
 DATA_PATH = os.path.join(os.path.dirname(__file__),"data","dict.pkl")
+FIXED_PA = 0.25
 
-@lru_cache(maxsize=None)
+# @lru_cache(maxsize=None)
 def load_data():
-    print("load data")
     with open(DATA_PATH,"rb") as f:
         return pickle.load(f)
-FIXED_PA = 0.25
+
 class Classifier():
     def __init__(self,*args):
         self.initialized = False
