@@ -8,6 +8,7 @@ import pickle
 from collections import Counter
 
 DATA_PATH = os.path.join(os.path.dirname(__file__),"data","dict.pkl")
+
 FIXED_PA = 0.25
 
 # @lru_cache(maxsize=None)
@@ -34,6 +35,18 @@ class Classifier():
         self.ish_degree = set(degrees.get("4"))
         self.least_degree = set(degrees.get("5"))
         self.neg_degree = set(degrees.get("6")).union(negations)
+        
+        # all_dgrees = self.most_degree\
+        #     .union(self.very_degree)\
+        #     .union(self.more_degree)\
+        #     .union(self.ish_degree)\
+        #     .union(self.least_degree)\
+        #     .union(self.neg_degree)\
+
+        pos_neg = self.pos_emotion.union(self.neg_emotion)
+        # pos_neg_eva = pos_envalute.union(neg_envalute)
+        jieba_fast.load_userdict(pos_neg)
+
         self.initialized = True
 
     def initialize(self):
@@ -44,11 +57,12 @@ class Classifier():
         neg_envalute = data["neg_envalute"]
         degrees = data["degrees"]
         negations = data["negations"]
+        # places = data["places"]
         self._initialize(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations)
 
     def predict(self,news, debug=False):
         news = re.sub(
-            r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', news)
+            '\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', news)
         news = re.sub("@[^\s]+", "", news)
         news = re.sub("“[^”]+”","",news) # remove quote
         # news = re.sub("【[^】]+】","",news) # remove quote
@@ -59,64 +73,63 @@ class Classifier():
         text_len = len(news)
         if not text_len:
             return 0
-        # word_list = [(x, y) for x, y in jiaba.posseg.cut(news)if not re.match("\W", x)]
         word_list = [x  for x in jieba_fast.cut(news)if not re.match("\W", x)]
-
+        if not word_list:
+            return 0
         word_scored = set()
         counter = Counter(word_list)
-        # print(word_list)
         pos_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
         neg_dict = {'times': 0, 'score': 0, 'words': [], 'index': []}
 
         for index, word in enumerate(word_list):
-            # word, tag = t
-            # if word in word_scored:
-            #     continue
             word_score = 0
+            pre_word = index - 1 >= 0 and word_list[index - 1]
+            next_word = index - 2 >= 0 and word_list[index - 2]
+            base_score = .1 + math.log(1+counter[word])
             # 判断极性
             if (word in self.pos_emotion) or (word in self.pos_envalute):
                 word_mark = "+" + word
                 if word_mark in word_scored:
                     continue
-                word_score += .1 + math.log(1+counter[word])
+                word_score += base_score
                 '''
                 两种情况：
                 1. 非常 不 好吃
                 2. 不是 很 好吃
                 需要极性反转
                 '''
-                if (index - 1 >= 0 and word_list[index - 1] in self.neg_degree) or (index - 2 >= 0 and word_list[index - 2] in self.neg_degree):
-                    word_score = FIXED_PA * (word_score + (-1))
+                if (pre_word in self.neg_degree) or (next_word in self.neg_degree):
+                    word_score = base_score * -1
                 debug and print("%s pos" % word)
                 word_scored.add(word_mark)
             elif (word in self.neg_emotion) or (word in self.neg_envalute):
                 word_mark = "-" + word
                 if word_mark in word_scored:
                     continue
-                word_score -= ( .1 + math.log(1+counter[word]))
+                word_score -= base_score
                 '''
                 1. 不是 不好
                 2. 不是 很 不好
                 极性反转
                 '''
-                if (index - 1 >= 0 and word_list[index - 1] in self.neg_degree) or (index - 2 >= 0 and word_list[index - 2] in self.neg_degree):
-                    word_score = FIXED_PA * (word_score + (-1))
+                if (pre_word in self.neg_degree) or (next_word in self.neg_degree):
+                    word_score = base_score * -1
                 debug and print("%s neg" % word)
-                word_scored.add("-"+word)
+                word_scored.add(word_mark)
             # 判断程度词
             if index - 1 >= 0:
                 # 赫夫曼二叉树，加权路径最小
-                con = (index - 2 >= 0 and word_list[index - 2] in self.more_degree)
-                if word_list[index - 1] in self.more_degree or con:
-                    word_score = FIXED_PA * (word_score + .3)
-                elif word_list[index - 1] in self.ish_degree or con:
-                    word_score = FIXED_PA * (word_score + .2)
-                elif word_list[index - 1] in self.very_degree or con:
-                    word_score = FIXED_PA * (word_score + .4)
-                elif word_list[index - 1] in self.least_degree or con:
-                    word_score = FIXED_PA * (word_score + .1)
-                elif word_list[index - 1] in self.most_degree or con:
-                    word_score = FIXED_PA * (word_score + .5)
+                con = (next_word in self.more_degree)
+                if pre_word in self.more_degree or con:
+                    word_score = word_score  * (FIXED_PA + .3)
+                elif pre_word in self.ish_degree or con:
+                    word_score = word_score  * (FIXED_PA + .2)
+                elif pre_word in self.very_degree or con:
+                    word_score = word_score  * (FIXED_PA + .4)
+                elif pre_word in self.least_degree or con:
+                    word_score = word_score  * (FIXED_PA + .1)
+                elif pre_word in self.most_degree or con:
+                    word_score = word_score  * (FIXED_PA + .5)
 
             if word_score > 0:
                 if debug:

@@ -18,44 +18,46 @@ pos_envalute = neg_envalute = []
 pos_emotion = []
 c = []
 
-most_degree = very_degree = more_degree = ish_degree = least_degree = []
+most_degree = very_degree = more_degree = ish_degree = least_degree = negations = degrees = []
 
 
-negations = set(json.load(open(os.path.join(DATA_DIR, 'negations.json'))))
+def bare_dict():
+    negations = set(json.load(open(os.path.join(DATA_DIR, 'negations.json'))))
 
-with open(os.path.join(DATA_DIR, "degrees.json")) as f:
-    degrees = json.load(f)
-
-
-with open(os.path.join(DATA_DIR, 'pos.txt')) as f:
-    pos_emotion = set([x.strip() for x in f.readlines()])
-
-with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
-    neg_emotion = set([x.strip() for x in f.readlines()])
-
-# with open(os.path.join(DATA_DIR, 'pos_eva.txt')) as f:
-#     pos_envalute = set([x.strip() for x in f.readlines()])
-
-# with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
-#     neg_envalute = set([x.strip() for x in f.readlines()])
-# jieba_fast.enable_parallel(4)
-places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
-jieba_fast.load_userdict(places)
+    with open(os.path.join(DATA_DIR, "degrees.json")) as f:
+        degrees = json.load(f)
 
 
-with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
-        open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
-    s1 = set([x.strip() for x in f1.readlines()])
-    s2 = set([x.strip() for x in f2.readlines()])
-    pos_emotion.union(s1)
-    neg_emotion.union(s2)
-    pos_neg = pos_emotion.union(neg_emotion)
-    # pos_neg_eva = pos_envalute.union(neg_envalute)
-    jieba_fast.load_userdict(s1.union(s2).union(pos_neg))
+    with open(os.path.join(DATA_DIR, 'pos.txt')) as f:
+        pos_emotion = set([x.strip() for x in f.readlines()])
+
+    with open(os.path.join(DATA_DIR, 'neg.txt')) as f:
+        neg_emotion = set([x.strip() for x in f.readlines()])
+
+    # with open(os.path.join(DATA_DIR, 'pos_eva.txt')) as f:
+    #     pos_envalute = set([x.strip() for x in f.readlines()])
+
+    # with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
+    #     neg_envalute = set([x.strip() for x in f.readlines()])
+    # jieba_fast.enable_parallel(4)
+    # places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
+    # jieba_fast.load_userdict(places)
+
+
+    with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
+            open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
+        s1 = set([x.strip() for x in f1.readlines()])
+        s2 = set([x.strip() for x in f2.readlines()])
+        pos_emotion.union(s1)
+        neg_emotion.union(s2)
+        pos_neg = pos_emotion.union(neg_emotion)
+        # pos_neg_eva = pos_envalute.union(neg_envalute)
+        jieba_fast.load_userdict(s1.union(s2).union(pos_neg))
 
 
 if __name__ == "__main__":
-    # classifier = Classifier(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations)
+    # bare_dict()
+    # classifier = Classifier(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations,places)
     if len(sys.argv) > 1:
         flag = predict(sys.argv[1], debug=True)
         print(flag)
