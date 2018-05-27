@@ -49,5 +49,9 @@ with open(output_path,"wb") as output:
     # output.write(picklestring)
     # pickle.dump(picklestring,output)
     result["negations"] = negations
+
+    # places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
+    # result["places"] = set(places)
+
     pickle.dump(result,output)
     
