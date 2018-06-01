@@ -45,6 +45,6 @@ Development
     
 ``./scripts/score.py``
 
-all data archives: [https://github.com/bung87/bixin/releases/tag/v0.0.1](https://github.com/bung87/bixin/releases/tag/v0.0.1)  
+all data archives: `https://github.com/bung87/bixin/releases/tag/v0.0.1 <https://github.com/bung87/bixin/releases/tag/v0.0.1>` 
 
 run accuray testing with all .txt files under **test_data** directory sentence per line end with a space and a tag **n** or **p**
