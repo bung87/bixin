@@ -4,12 +4,14 @@ import os
 import sys
 import re
 import jieba_fast
-import jieba_fast.posseg as pseg
+# import jieba_fast.posseg as pseg
 import json
+from time import time
+from math import log2
 
 aaa = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(aaa)
-from bixin import Classifier,load_data,predict
+from bixin import Classifier, load_data, predict
 # some codes adapt from https://github.com/godbmw/various-codes/blob/master/DictEmotionAlgorithm/Main.py
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -27,7 +29,6 @@ def bare_dict():
     with open(os.path.join(DATA_DIR, "degrees.json")) as f:
         degrees = json.load(f)
 
-
     with open(os.path.join(DATA_DIR, 'pos.txt')) as f:
         pos_emotion = set([x.strip() for x in f.readlines()])
 
@@ -43,7 +44,6 @@ def bare_dict():
     # places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
     # jieba_fast.load_userdict(places)
 
-
     with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
             open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
         s1 = set([x.strip() for x in f1.readlines()])
@@ -55,7 +55,24 @@ def bare_dict():
         jieba_fast.load_userdict(s1.union(s2).union(pos_neg))
 
 
+_suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+
+def file_size(size):
+    # determine binary order in steps of size 10
+    # (coerce to int, // still returns a float)
+    order = int(log2(size) / 10) if size else 0
+    # format file size
+    # (.4g results in rounded numbers for exact matches and max 3 decimals,
+    # should never resort to exponent values)
+    return '{:.4g} {}'.format(size / (1 << (order * 10)), _suffixes[order])
+
+
 if __name__ == "__main__":
+    jieba_fast.initialize()
+    predict.classifier.initialize()
+
+    t1 = time()
     # bare_dict()
     # classifier = Classifier(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations,places)
     if len(sys.argv) > 1:
@@ -74,12 +91,14 @@ if __name__ == "__main__":
         count = 0
         right = 0.0
         zero = 0.0
+        size = 0.0
         for file in files:
             with open(file) as f:
                 for line in f:
                     count += 1
                     sp = re.split('\t', line, maxsplit=1)
                     flag = sp[1].strip()
+                    size += sys.getsizeof(sp[0])
                     r = predict(sp[0])
 
                     if r == 0:
@@ -90,16 +109,23 @@ if __name__ == "__main__":
                     elif flag == "n" and r < 0:
                         right += 1
                     else:
-                        print(sp[0])
-                        print(flag, r)
-
+                        pass
+                        # print(sp[0])
+                        # print(flag, r)
+        t2 = time()
         print("Total :%s" % count)
 
         print("Total Zero:%d ,percent:%f" % (zero, zero/count))
 
-        count -= zero
-        print("Total without Zero:%d ,percent:%f" % (count, zero/count))
+        count2 = count - zero
+        print("Total without Zero:%d ,percent:%f" % (count2, count2/count))
 
-        # 0.6248134726071201 0.629716 accuracy: 0.624813 accuracy: 0.612663 downwith evalute list 0.624813
-        print("accuracy: %f" % (right/count))
+        print("Accuracy: %f" % (right/count2))
         # print(load_data.cache_info())
+
+        tm = t2 - t1
+        per = size/tm
+        print("Docs size:")
+        print(file_size(size))
+        print("Time costs:%f seconds, %s per second" %
+              (tm, file_size(per)))

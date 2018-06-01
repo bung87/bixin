@@ -4,7 +4,7 @@ Chinese Sentiment Analysis base on dictionary and rules.
 
 Installation
 ============
-``> pip install git+https://github.com/bung87/bixin``
+``> pip3 install git+https://github.com/bung87/bixin``
 
 Usage
 =====
@@ -23,9 +23,9 @@ Test with 4091 taged corpus mixed up with shopping comments and Sina Weibo tweet
 
 accuracy: **0.842130**
 
-Test with 6232 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets 、hotel reviews 、news and financial news
+Test with 6226 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets 、hotel reviews 、news and financial news
 
-accuracy: **0.822529**
+accuracy: **0.823482**
 
 **Notice**:neutral texts are all ignored.
 
@@ -34,7 +34,7 @@ details about dataset `https://github.com/bung87/bixin/wiki <https://github.com/
 Development
 ===========
 
-``> pip install -e git+https://github.com/bung87/bixin``
+``> pip3 install -e git+https://github.com/bung87/bixin``
 
 
 .. code-block::
@@ -44,5 +44,7 @@ Development
     ./scripts/release_data.py release data to package
     
 ``./scripts/score.py``
+
+all data archives: [https://github.com/bung87/bixin/releases/tag/v0.0.1](https://github.com/bung87/bixin/releases/tag/v0.0.1)  
 
 run accuray testing with all .txt files under **test_data** directory sentence per line end with a space and a tag **n** or **p**

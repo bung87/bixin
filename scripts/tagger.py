@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# prepare word from vary dictionaries
 import os
 import sys
 import re
@@ -77,10 +77,17 @@ def common_igrnoe(word, tag, text_len):
 
 
 stop_ns = ["安宁"]
-# figure out which parts ignore this is complicated
-preserve_pos_words = ["真爱",  "爱", "加油", "心系", "帅", "嗨翻天"]
-preserve_neg_words = ["毁", "莫名奇妙", "承认", "曝光"]
-stop_words = ["意味", "布展", "人家", "承认"]
+maintained_dir = os.path.join(DICTIONARIES_DIR, "self_maintained")
+preserve_pos_words = preserve_neg_words = stop_words = []
+
+with open(os.path.join(maintained_dir, "pos.txt")) as f:
+    preserve_pos_words = set([x.strip() for x in f])
+
+with open(os.path.join(maintained_dir, "neg.txt")) as f:
+    preserve_neg_words = set([x.strip() for x in f])
+
+with open(os.path.join(maintained_dir, "stopwords.txt")) as f:
+    stop_words = set([x.strip() for x in f])
 
 
 def clean_word(s):
