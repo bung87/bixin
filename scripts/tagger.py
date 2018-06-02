@@ -9,6 +9,10 @@ import jieba_fast.posseg as pseg
 from prefixtree import PrefixSet
 import subprocess
 
+big_dict = os.path.join(os.path.dirname(__file__), "..", "bixin","data","dict.txt.big")
+jieba_fast.set_dictionary(big_dict)
+jieba_fast.initialize()
+
 DICTIONARIES_DIR = os.path.join(
     os.path.dirname(__file__), "..", "dictionaries")
 
@@ -108,39 +112,48 @@ def clean_words(s):
     words = list(pseg.cut(text))
     text_len = len(text)
     words_len = len(words)
-    # _words = [w for w, t in words]
-    # the_words = None
-    # if words_len == 2 or words_len == 3:
-    #     if _words[0] in ["有"]:
-    #         the_words = "".join(_words[1:])
-    #     elif _words[words_len-1] in ["的","地"]:
-    #         the_words = "".join(_words[:-1])
-    #     else:
-    #         the_words = text
-    # elif _words[words_len-1] == "的":
-    #     the_words = "".join(_words[:-1])
-    # elif _words[0] == "使":
-    #     the_words = "".join(_words[1:])
-    #
-    # if the_words:
-    #     words = list(pseg.cut(the_words))
-    #     text_len = len(the_words)
-    #     words_len = len(words)
+
 
     if words_len == 1:
         for word, tag in words:
             if tag == "n" and text_len == 1:
                 return None
+            # nr 阴冷
             if tag.startswith('nr') or (tag.startswith('ns') and word not in stop_ns)or tag.startswith('nt') or tag.startswith('nz'):
                 return None
             if not common_igrnoe(word, tag, text_len):
                 return None
-
+    elif words[words_len-1].flag in ["uj","uv"]:
+        # [pair('有模有样', 'l'), pair('地', 'uv')]
+        # [pair('阴冷', 'nr'), pair('的', 'uj')]
+        content = "".join([x.word for x in words[:-1]])
+        if  content in stop_words:
+            return None
+        return content
     elif all(y == list(words[0])[1] for x, y in words):
         return None
 
     return text
 
+# def filter_line(line):
+#     _words = line
+#     the_words = None
+#     if words_len == 2 or words_len == 3:
+#         if _words[0] in ["有"]:
+#             the_words = "".join(_words[1:])
+#         elif _words[words_len-1] in ["的","地"]:
+#             the_words = "".join(_words[:-1])
+#         else:
+#             the_words = text
+#     elif _words[words_len-1] == "的":
+#         the_words = "".join(_words[:-1])
+#     elif _words[0] == "使":
+#         the_words = "".join(_words[1:])
+#
+#     if the_words:
+#         words = list(pseg.cut(the_words))
+#         text_len = len(the_words)
+#         words_len = len(words)
 
 def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_result, neg_result=neg_result):
     with open(pos_file) as f,\
@@ -294,7 +307,7 @@ with open(polarity_table) as f,\
         elif re.match('[0-9a-zA-Z：:]+', word):
             continue
         polarity = float(cols[1])
-        if polarity > -1.25:  # 忽略大量社交媒体热词高频词
+        if polarity > -1.29249906329:  # 忽略大量社交媒体热词高频词
             break
         # if polarity > 0:
         #     pos.write(new_line % word)
