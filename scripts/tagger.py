@@ -106,9 +106,27 @@ def clean_words(s):
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
     #     return None
     words = list(pseg.cut(text))
-    _words = [w for w, t in words]
     text_len = len(text)
     words_len = len(words)
+    # _words = [w for w, t in words]
+    # the_words = None
+    # if words_len == 2 or words_len == 3:
+    #     if _words[0] in ["有"]:
+    #         the_words = "".join(_words[1:])
+    #     elif _words[words_len-1] in ["的","地"]:
+    #         the_words = "".join(_words[:-1])
+    #     else:
+    #         the_words = text
+    # elif _words[words_len-1] == "的":
+    #     the_words = "".join(_words[:-1])
+    # elif _words[0] == "使":
+    #     the_words = "".join(_words[1:])
+    #
+    # if the_words:
+    #     words = list(pseg.cut(the_words))
+    #     text_len = len(the_words)
+    #     words_len = len(words)
+
     if words_len == 1:
         for word, tag in words:
             if tag == "n" and text_len == 1:
@@ -117,15 +135,7 @@ def clean_words(s):
                 return None
             if not common_igrnoe(word, tag, text_len):
                 return None
-    # elif words_len == 2 or words_len == 3:
-    #     if _words[0] in ["有"]:
-    #         return _words[1]
-    #     elif _words[words_len-1] in ["的","地"]:
-    #         return _words[0]
-    #     else:
-    #         return text
-    # elif _words[words_len-1] == "的" or _words[0] == "使":
-    #     return None
+
     elif all(y == list(words[0])[1] for x, y in words):
         return None
 

@@ -11,7 +11,7 @@ from collections import Counter
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "dict.pkl")
 
-FIXED_PA = 1.25
+FIXED_PA = 1.6
 
 # @lru_cache(maxsize=None)
 
