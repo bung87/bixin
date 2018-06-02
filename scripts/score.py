@@ -69,7 +69,7 @@ def file_size(size):
 
 
 if __name__ == "__main__":
-    jieba_fast.initialize()
+    # jieba_fast.initialize()
     predict.classifier.initialize()
 
     t1 = time()
