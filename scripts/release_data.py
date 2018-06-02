@@ -10,7 +10,7 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "bixin", "data")
 output_path = os.path.join(OUTPUT_DIR, "dict.pkl")
 
 MAINTAINED_DATA_DIR = os.path.join(
-    os.path.dirname(__file__), "..", "self_maintained")
+    os.path.dirname(__file__), "..","dictionaries", "self_maintained")
 
 MAINTAINED_POS = os.path.join(MAINTAINED_DATA_DIR, "pos.txt")
 MAINTAINED_NEG = os.path.join(MAINTAINED_DATA_DIR, "neg.txt")
@@ -38,6 +38,15 @@ def release():
 
             result["neg_emotion"] = neg_emotion
 
+        with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f:
+            pos_sentence = set([x.strip() for x in f])
+            result["pos_sentence"] = pos_sentence
+
+        with open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f:
+            neg_sentence = set([x.strip() for x in f])
+
+            result["neg_sentence"] = neg_sentence
+
         result["pos_envalute"] = []
         result["neg_envalute"] = []
 
@@ -49,8 +58,10 @@ def release():
             json.load(open(os.path.join(DATA_DIR, 'negations.json'))))
 
         result["negations"] = negations
-
         # places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
         # result["places"] = set(places)
 
         pickle.dump(result, output)
+
+if __name__ == "__main__":
+    release()

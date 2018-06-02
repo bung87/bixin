@@ -11,7 +11,7 @@ from collections import Counter
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "dict.pkl")
 
-FIXED_PA = 0.25
+FIXED_PA = 1.25
 
 # @lru_cache(maxsize=None)
 
@@ -66,9 +66,9 @@ class Classifier():
 
     def initialize(self):
         data = load_data()
-        pos_emotion = data["pos_emotion"]
+        pos_emotion = data["pos_emotion"].union(data["pos_sentence"])
         pos_envalute = data["pos_envalute"]
-        neg_emotion = data["neg_emotion"]
+        neg_emotion = data["neg_emotion"].union(data["neg_sentence"])
         neg_envalute = data["neg_envalute"]
         degrees = data["degrees"]
         negations = data["negations"]
@@ -170,8 +170,8 @@ class Classifier():
         # len_a = len(aa) or 1
         # len_b = len(bb) or 1
         # r = math.fsum(aa)/len_a -  abs(math.fsum(bb)/len_b)
-        # print( r )  
-        return pos_sum - abs(neg_sum)
+        # print( r )
+        return pos_sum + neg_sum
 
 
 def predict(x, debug=False):

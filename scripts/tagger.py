@@ -117,15 +117,15 @@ def clean_words(s):
                 return None
             if not common_igrnoe(word, tag, text_len):
                 return None
-    elif words_len == 2 or words_len == 3:
-        if _words[0] in ["有"]:
-            return _words[1]
-        elif _words[words_len-1] in ["的","地"]:
-            return _words[0]
-        else:
-            return text
-    elif _words[words_len-1] == "的" or _words[0] == "使":
-        return None
+    # elif words_len == 2 or words_len == 3:
+    #     if _words[0] in ["有"]:
+    #         return _words[1]
+    #     elif _words[words_len-1] in ["的","地"]:
+    #         return _words[0]
+    #     else:
+    #         return text
+    # elif _words[words_len-1] == "的" or _words[0] == "使":
+    #     return None
     elif all(y == list(words[0])[1] for x, y in words):
         return None
 
