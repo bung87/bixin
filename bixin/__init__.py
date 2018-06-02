@@ -8,6 +8,8 @@ import math
 import pickle
 from collections import Counter
 # from decimal import Decimal
+big_dict = os.path.join(os.path.dirname(__file__), "data","dict.txt.big")
+jieba_fast.set_dictionary(big_dict)
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "dict.pkl")
 
@@ -61,6 +63,7 @@ class Classifier():
         pos_neg = self.pos_emotion.union(self.neg_emotion)
         # pos_neg_eva = pos_envalute.union(neg_envalute)
         jieba_fast.load_userdict(pos_neg)
+        jieba_fast.initialize()
 
         self.initialized = True
 
