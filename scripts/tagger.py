@@ -7,6 +7,7 @@ import json
 import jieba_fast
 import jieba_fast.posseg as pseg
 from prefixtree import PrefixSet
+import subprocess
 
 DICTIONARIES_DIR = os.path.join(
     os.path.dirname(__file__), "..", "dictionaries")
@@ -337,7 +338,7 @@ with open(pos_result, 'a') as pos,\
 # 短语
 
 
-def multi_write(words, result, sentence_file):
+def multi_write(words, result, sentence_file,tag):
     if len(words) == 1:
         for x, tag in words:
             word = x.strip()
@@ -345,7 +346,10 @@ def multi_write(words, result, sentence_file):
                 continue
             result.write(new_line % word)
     else:
-        sentence_file.write(new_line % "".join([x for x, i in words]))
+        if tag =="pos":
+            pos_sentences.add("".join([x for x, i in words]))
+        else:
+            neg_sentences.add("".join([x for x, i in words]))
 
 
 polarity_table = os.path.join(
@@ -354,6 +358,7 @@ polarity_table = os.path.join(
 pos_sentence = os.path.join(DATA_DIR, "pos_sentence.txt")
 
 neg_sentence = os.path.join(DATA_DIR, "neg_sentence.txt")
+
 
 with open(polarity_table) as f,\
         open(pos_result, 'a') as pos,\
@@ -370,12 +375,13 @@ with open(polarity_table) as f,\
         pos_words = list(pseg.cut(pos_sent)) if pos_sent else None
         neg_words = list(pseg.cut(neg_sent)) if neg_sent else None
 
-        pos_words and multi_write(pos_words, pos, pos_sentence)
-        neg_words and multi_write(neg_words, neg, neg_sentence)
+        pos_words and multi_write(pos_words, pos, pos_sentence,"pos")
+        neg_words and multi_write(neg_words, neg, neg_sentence,"neg")
     for word in pos_sentences:
         pos_sentence.write(new_line % word)
     for word in neg_sentences:
         neg_sentence.write(new_line % word)
+
 
 with open(pos_result) as pos,\
         open(neg_result) as neg,\
@@ -387,7 +393,7 @@ with open(pos_result) as pos,\
     print(line)
     readme.write(new_line % line)
 
-import subprocess
+
 
 uniq_io = "sort %s | uniq > %s"
 
