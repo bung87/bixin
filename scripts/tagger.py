@@ -27,6 +27,9 @@ new_line = "%s\n"
 
 ps = PrefixSet()
 
+pos_sentences = set()
+neg_sentences = set()
+
 places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
 
 with open(places) as f:
@@ -65,7 +68,7 @@ def common_igrnoe(word, tag, text_len):
         return None
     elif tag.startswith('x'):  # x 字符串 xx 非语素字 xu 网址URL
         return None
-    elif tag == 'zg':
+    elif tag == 'zg': # 状态语素
         return None
     elif tag == "f":
         return None
@@ -90,7 +93,7 @@ with open(os.path.join(maintained_dir, "stopwords.txt")) as f:
     stop_words = set([x.strip() for x in f])
 
 
-def clean_word(s):
+def clean_words(s):
     text = re.sub(r'&#\d+;', "", s.strip())
     text = re.sub(r'[:：？。，\.#·、…]+$', "", text)
     text = re.sub('\w+·\w+', "", text)
@@ -102,8 +105,10 @@ def clean_word(s):
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
     #     return None
     words = list(pseg.cut(text))
+    _words = [w for w, t in words]
     text_len = len(text)
-    if len(words) == 1:
+    words_len = len(words)
+    if words_len == 1:
         for word, tag in words:
             if tag == "n" and text_len == 1:
                 return None
@@ -111,6 +116,15 @@ def clean_word(s):
                 return None
             if not common_igrnoe(word, tag, text_len):
                 return None
+    elif words_len == 2 or words_len == 3:
+        if _words[0] in ["有"]:
+            return _words[1]
+        elif _words[words_len-1] in ["的","地"]:
+            return _words[0]
+        else:
+            return text
+    elif _words[words_len-1] == "的" or _words[0] == "使":
+        return None
     elif all(y == list(words[0])[1] for x, y in words):
         return None
 
@@ -123,10 +137,17 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
         if start_line:
             for x in range(start_line):
                 next(f)
-        for line in f:
+        for line_raw in f:
+            line = line_raw.strip()
             if line.startswith("#"):
                 continue
-            word = clean_word(line)
+            if re.search("[你我他]|自己",line) and len(line) > 4:
+                pos_sentences.add(line)
+                continue
+            if re.search("\W",line):
+                pos_sentences.add(line)
+                continue
+            word = clean_words(line)
             if word:
                 f2.write(new_line % word)
 
@@ -135,10 +156,17 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
         if start_line:
             for x in range(start_line):
                 next(f)
-        for line in f:
+        for line_raw in f:
+            line =line_raw.strip()
             if line.startswith("#"):
                 continue
-            word = clean_word(line)
+            if re.search("[你我他]|自己", line) and len(line) > 4:
+                neg_sentences.add(line)
+                continue
+            if re.search("\W",line):
+                neg_sentences.add(line)
+                continue
+            word = clean_words(line)
             if word:
                 f2.write(new_line % word)
 
@@ -183,10 +211,24 @@ with open(hontai_file) as f,\
     next(f)
     for line in f:
         cols = line.split(",")
-        word = clean_word(cols[0])
+        polarity = int(cols[6])
+        if re.search("[你我他]|自己", cols[0]) and len(cols[0]) > 4:
+            if polarity == 1:
+                pos_sentences.add(cols[0])
+            elif polarity == 2:
+                neg_sentences.add(cols[0])
+            continue
+        if re.search("\W",cols[0]):
+            if polarity == 1:
+                pos_sentences.add(cols[0])
+            elif polarity == 2:
+                neg_sentences.add(cols[0])
+            continue
+        word = clean_words(cols[0])
+        
         if not word:
             continue
-        polarity = int(cols[6])
+        
         if polarity == 1:
             pos.write(new_line % word)
         elif polarity == 2:
@@ -202,12 +244,25 @@ with open(polarity_table) as f,\
         next(f)
     for line in f:
         cols = line.split("\t")
-        word = clean_word(cols[0])
-        if not word:
-            continue
         polarity = float(cols[1])
         if abs(polarity) <= 1.5:
             continue
+        if re.search("[你我他]|自己", cols[0]) and len(cols[0]) > 4:
+            if polarity > 0:
+                pos_sentences.add(cols[0])
+            elif polarity < 0:
+                neg_sentences.add(cols[0])
+            continue
+        if re.search("\W",cols[0]):
+            if polarity > 0:
+                pos_sentences.add(cols[0])
+            elif polarity < 0:
+                neg_sentences.add(cols[0])
+            continue
+        word = clean_words(cols[0])
+        if not word:
+            continue
+
         if polarity > 0:
             pos.write(new_line % word)
         elif polarity < 0:
@@ -222,7 +277,7 @@ with open(polarity_table) as f,\
 
     for line in f:
         cols = line.split(" ")
-        word = clean_word(cols[0])
+        word = clean_words(cols[0])
         if not word:
             continue
         elif re.match('[0-9a-zA-Z：:]+', word):
@@ -234,6 +289,50 @@ with open(polarity_table) as f,\
         #     pos.write(new_line % word)
         # elif polarity < 0:
         neg.write(new_line % word)
+
+
+
+tsinghua_dir = os.path.join(DICTIONARIES_DIR, "清华大学李军中文褒贬义词典")
+
+pos_file = os.path.join(tsinghua_dir, "tsinghua.positive.gb.txt")
+
+neg_file = os.path.join(tsinghua_dir, "tsinghua.negative.gb.txt")
+
+simple_write(pos_file, neg_file, mode='a')
+
+
+hownet_dir = os.path.join(DICTIONARIES_DIR, "知网Hownet情感词典")
+
+pos_file = os.path.join(hownet_dir, "正面情感词语（中文）.txt")
+
+neg_file = os.path.join(hownet_dir, "负面情感词语（中文）.txt")
+
+simple_write(pos_file, neg_file, start_line=3, mode='a')
+
+
+polarity_table = os.path.join(DICTIONARIES_DIR, '褒贬词及其近义词', "褒贬词及其近义词.csv")
+
+with open(polarity_table) as f,\
+        open(pos_result, 'a') as pos,\
+        open(neg_result, 'a') as neg:
+    next(f)
+    for line in f:
+        cols = line.split(",")
+        word = clean_words(cols[0])
+        if not word:
+            continue
+        polarity = cols[2]
+        if polarity == "褒义":
+            pos.write(new_line % word)
+        elif polarity == "贬义":
+            neg.write(new_line % word)
+
+with open(pos_result, 'a') as pos,\
+        open(neg_result, 'a') as neg:
+    for x in preserve_pos_words:
+        pos.write(new_line % x)
+    for x in preserve_neg_words:
+        neg.write(new_line % x)
 
 # 短语
 
@@ -273,48 +372,10 @@ with open(polarity_table) as f,\
 
         pos_words and multi_write(pos_words, pos, pos_sentence)
         neg_words and multi_write(neg_words, neg, neg_sentence)
-
-tsinghua_dir = os.path.join(DICTIONARIES_DIR, "清华大学李军中文褒贬义词典")
-
-pos_file = os.path.join(tsinghua_dir, "tsinghua.positive.gb.txt")
-
-neg_file = os.path.join(tsinghua_dir, "tsinghua.negative.gb.txt")
-
-simple_write(pos_file, neg_file, mode='a')
-
-
-hownet_dir = os.path.join(DICTIONARIES_DIR, "知网Hownet情感词典")
-
-pos_file = os.path.join(hownet_dir, "正面情感词语（中文）.txt")
-
-neg_file = os.path.join(hownet_dir, "负面情感词语（中文）.txt")
-
-simple_write(pos_file, neg_file, start_line=3, mode='a')
-
-
-polarity_table = os.path.join(DICTIONARIES_DIR, '褒贬词及其近义词', "褒贬词及其近义词.csv")
-
-with open(polarity_table) as f,\
-        open(pos_result, 'a') as pos,\
-        open(neg_result, 'a') as neg:
-    next(f)
-    for line in f:
-        cols = line.split(",")
-        word = clean_word(cols[0])
-        if not word:
-            continue
-        polarity = cols[2]
-        if polarity == "褒义":
-            pos.write(new_line % word)
-        elif polarity == "贬义":
-            neg.write(new_line % word)
-
-with open(pos_result, 'a') as pos,\
-        open(neg_result, 'a') as neg:
-    for x in preserve_pos_words:
-        pos.write(new_line % x)
-    for x in preserve_neg_words:
-        neg.write(new_line % x)
+    for word in pos_sentences:
+        pos_sentence.write(new_line % word)
+    for word in neg_sentences:
+        neg_sentence.write(new_line % word)
 
 with open(pos_result) as pos,\
         open(neg_result) as neg,\

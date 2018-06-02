@@ -44,15 +44,15 @@ def bare_dict():
     # places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
     # jieba_fast.load_userdict(places)
 
-    with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
-            open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
-        s1 = set([x.strip() for x in f1.readlines()])
-        s2 = set([x.strip() for x in f2.readlines()])
-        pos_emotion.union(s1)
-        neg_emotion.union(s2)
-        pos_neg = pos_emotion.union(neg_emotion)
-        # pos_neg_eva = pos_envalute.union(neg_envalute)
-        jieba_fast.load_userdict(s1.union(s2).union(pos_neg))
+    # with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
+    #         open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
+    #     s1 = set([x.strip() for x in f1.readlines()])
+    #     s2 = set([x.strip() for x in f2.readlines()])
+    #     pos_emotion.union(s1)
+    #     neg_emotion.union(s2)
+    pos_neg = pos_emotion.union(neg_emotion)
+    # pos_neg_eva = pos_envalute.union(neg_envalute)
+    jieba_fast.load_userdict(pos_neg)
 
 
 _suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']

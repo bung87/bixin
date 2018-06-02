@@ -181,6 +181,13 @@ def predict(x, debug=False):
         predict.classifier.initialize()
         return predict.classifier.predict(x, debug=debug)
 
+def cut(*args,**argv):
+    if predict.classifier.initialized:
+        return jieba_fast.cut(*args,**argv)
+    else:
+        predict.classifier.initialize()
+        return jieba_fast.cut(*args,**argv)
+
 
 predict.classifier = Classifier()
 
