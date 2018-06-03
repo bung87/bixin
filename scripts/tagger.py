@@ -116,7 +116,7 @@ def clean_words(s):
 
     if words_len == 1:
         for word, tag in words:
-            if tag == "n" and text_len == 1:
+            if tag == "n" and (text_len == 1 or text_len == 3):
                 return None
             # nr 阴冷
             if tag.startswith('nr') or (tag.startswith('ns') and word not in stop_ns)or tag.startswith('nt') or tag.startswith('nz'):

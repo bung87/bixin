@@ -39,11 +39,17 @@ class Classifier():
         if len(args):
             self._initialize(*args)
 
-    def _initialize(self, pos_emotion, pos_envalute, neg_emotion, neg_envalute, degrees, negations):
+    def _initialize(self, pos_emotion, pos_evaluation, neg_emotion, neg_evaluation, degrees, negations):
         self.pos_emotion = pos_emotion
-        self.pos_envalute = pos_envalute
         self.neg_emotion = neg_emotion
-        self.neg_envalute = neg_envalute
+        pos_neg_eva = set()
+        if self.include_evalution_dict:
+            self.pos_evaluation = pos_evaluation
+            self.neg_evaluation = neg_evaluation
+            pos_neg_eva = pos_evaluation.union(neg_evaluation)
+        else:
+            self.pos_evaluation = self.pos_emotion
+            self.neg_evaluation = self.neg_emotion
         # self.negations = negations
         # self.degrees = degrees
         self.most_degree = set(degrees.get("1"))
@@ -61,23 +67,24 @@ class Classifier():
         #     .union(self.neg_degree)\
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
-        # pos_neg_eva = pos_envalute.union(neg_envalute)
-        jieba_fast.load_userdict(pos_neg)
+        
+        jieba_fast.load_userdict(pos_neg.union(pos_neg_eva))
         jieba_fast.initialize()
 
         self.initialized = True
 
-    def initialize(self):
+    def initialize(self,include_evalution_dict=False):
+        self.include_evalution_dict = include_evalution_dict
         data = load_data()
         pos_emotion = data["pos_emotion"].union(data["pos_sentence"])
-        pos_envalute = data["pos_envalute"]
+        pos_evaluation = data["pos_evaluation"]
         neg_emotion = data["neg_emotion"].union(data["neg_sentence"])
-        neg_envalute = data["neg_envalute"]
+        neg_evaluation = data["neg_evaluation"]
         degrees = data["degrees"]
         negations = data["negations"]
         # places = data["places"]
-        self._initialize(pos_emotion, pos_envalute, neg_emotion,
-                         neg_envalute, degrees, negations)
+        self._initialize(pos_emotion, pos_evaluation, neg_emotion,
+                         neg_evaluation, degrees, negations)
 
     def predict(self, news, debug=False):
         news = re.sub(
@@ -107,7 +114,7 @@ class Classifier():
             pre2_word = index - 2 >= 0 and word_list[index - 2]
             base_score = math.log1p(counter[word])
             # 判断极性
-            if (word in self.pos_emotion) or (word in self.pos_envalute):
+            if (word in self.pos_evaluation) or (word in self.pos_emotion) :
                 word_mark = "+" + word
                 if word_mark in word_scored:
                     continue
@@ -122,7 +129,7 @@ class Classifier():
                     word_score = base_score * -1
                 debug and print("%s pos" % word)
                 word_scored.add(word_mark)
-            elif (word in self.neg_emotion) or (word in self.neg_envalute):
+            elif (word in self.neg_evaluation) or (word in self.neg_emotion) :
                 word_mark = "-" + word
                 if word_mark in word_scored:
                     continue
@@ -168,20 +175,24 @@ class Classifier():
         debug and print(str(pos_dict)+"\n"+str(neg_dict))
         neg_sum = neg_dict['score']
         pos_sum = pos_dict['score']
+        all_sum = pos_sum + abs(neg_sum)
+        if all_sum == 0:
+            return 0
         # aa = norm(pos_dict['scores'])
         # bb = norm(neg_dict['scores'])
         # len_a = len(aa) or 1
         # len_b = len(bb) or 1
         # r = math.fsum(aa)/len_a -  abs(math.fsum(bb)/len_b)
         # print( r )
-        return pos_sum + neg_sum
+        r = (pos_sum + neg_sum) /all_sum
+        return float(format(r,".2f"))
 
 
-def predict(x, debug=False):
+def predict(x, include_evalution_dict=False,debug=False):
     if predict.classifier.initialized:
         return predict.classifier.predict(x, debug=debug)
     else:
-        predict.classifier.initialize()
+        predict.classifier.initialize(include_evalution_dict=include_evalution_dict)
         return predict.classifier.predict(x, debug=debug)
 
 def cut(*args,**argv):

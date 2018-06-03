@@ -20,6 +20,15 @@ def prepare(obj):
     picklestring = pickle.dumps(obj)
     return optimize(picklestring)
 
+def pos_eva():
+    with open(os.path.join(DATA_DIR, 'pos_eva.txt')) as f:
+        words = set([x.strip() for x in f])
+        return words
+
+def neg_eva():
+    with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
+        words = set([x.strip() for x in f])
+        return words
 
 def release():
     with open(output_path, "wb") as output:
@@ -47,8 +56,8 @@ def release():
 
             result["neg_sentence"] = neg_sentence
 
-        result["pos_envalute"] = []
-        result["neg_envalute"] = []
+        result["pos_evaluation"] = pos_eva()
+        result["neg_evaluation"] = neg_eva()
 
         with open(os.path.join(DATA_DIR, "degrees.json")) as f:
             degrees = json.load(f)
