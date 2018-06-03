@@ -70,13 +70,13 @@ def file_size(size):
 
 if __name__ == "__main__":
     # jieba_fast.initialize()
-    predict.classifier.initialize()
+    predict.classifier.initialize(include_tc=True)
 
     t1 = time()
     # bare_dict()
     # classifier = Classifier(pos_emotion,pos_envalute,neg_emotion,neg_envalute,degrees,negations,places)
     if len(sys.argv) > 1:
-        flag = predict(sys.argv[1], debug=True)
+        flag = predict(sys.argv[1],include_tc=True, debug=True)
         print(flag)
     else:
         from os import walk

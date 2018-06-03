@@ -133,8 +133,16 @@ def clean_words(s):
         return content
     elif words[0].word == "使":
         left_words = "".join([x.word for x in words[1:]])
+        if left_words in stop_words:
+            return None
         if left_words in vocs:
             return left_words
+    # elif words[-1].word in ["的","地"]:
+    #     left_words = "".join([x.word for x in words[:-1]])
+    #     if left_words in stop_words:
+    #         return None
+    #     if left_words in vocs:
+    #         return left_words
     elif all(y == list(words[0])[1] for x, y in words):
         return None
 

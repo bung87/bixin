@@ -67,18 +67,20 @@ class Classifier():
         #     .union(self.neg_degree)\
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
-        
         jieba_fast.load_userdict(pos_neg.union(pos_neg_eva))
         jieba_fast.initialize()
 
         self.initialized = True
 
-    def initialize(self,include_evalution_dict=False):
+    def initialize(self,include_evalution_dict=False,include_tc=False):
         self.include_evalution_dict = include_evalution_dict
         data = load_data()
         pos_emotion = data["pos_emotion"].union(data["pos_sentence"])
         pos_evaluation = data["pos_evaluation"]
         neg_emotion = data["neg_emotion"].union(data["neg_sentence"])
+        if include_tc:
+            pos_emotion = pos_emotion.union(data["pos_emotion_tc"])
+            neg_emotion = neg_emotion.union(data["neg_emotion_tc"])
         neg_evaluation = data["neg_evaluation"]
         degrees = data["degrees"]
         negations = data["negations"]
@@ -188,11 +190,11 @@ class Classifier():
         return float(format(r,".2f"))
 
 
-def predict(x, include_evalution_dict=False,debug=False):
+def predict(x, include_evalution_dict=False,include_tc=False,debug=False):
     if predict.classifier.initialized:
         return predict.classifier.predict(x, debug=debug)
     else:
-        predict.classifier.initialize(include_evalution_dict=include_evalution_dict)
+        predict.classifier.initialize(include_evalution_dict=include_evalution_dict,include_tc=include_tc)
         return predict.classifier.predict(x, debug=debug)
 
 def cut(*args,**argv):

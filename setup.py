@@ -1,8 +1,5 @@
 # -*- coding:utf-8 -*-
 
-import os
-import sys
-
 from setuptools import setup, find_packages
 
 install_requires = ["jieba_fast"]
@@ -16,7 +13,7 @@ setup(
         'bixin.data': ['*.pkl']
     },
     extras_require={
-        'dev': ['prefixtree>=0.2.5', 'chardet>=3.0.4']
+        'dev': ['prefixtree>=0.2.5', 'chardet>=3.0.4','opencc-python-reimplemented>=0.1.3']
     },
     install_requires=install_requires
     # prefixtree need at least 0.2.5 if not in pypi install if from github
