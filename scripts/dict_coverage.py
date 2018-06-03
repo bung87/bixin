@@ -1,7 +1,8 @@
 import os
 import sys
 import jieba_fast
-from jieba_fast import dt
+from jieba_fast import dt,default_logger
+default_logger.disabled = True
 
 big_dict = os.path.join(os.path.dirname(__file__), "..", "bixin", "data", "dict.txt.big")
 jieba_fast.set_dictionary(big_dict)

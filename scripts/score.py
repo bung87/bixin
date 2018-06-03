@@ -8,7 +8,9 @@ import jieba_fast
 import json
 from time import time
 from math import log2
+from jieba_fast import default_logger
 
+default_logger.disabled = True
 aaa = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(aaa)
 from bixin import Classifier, load_data, predict

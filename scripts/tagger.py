@@ -8,6 +8,14 @@ import jieba_fast
 import jieba_fast.posseg as pseg
 from prefixtree import PrefixSet
 import subprocess
+from jieba_fast import default_logger
+from jieba import default_logger as default_logger2
+
+default_logger.disabled = True
+default_logger.propagate = False
+
+default_logger2.disabled = True
+default_logger2.propagate = False
 
 big_dict = os.path.join(os.path.dirname(__file__), "..", "bixin","data","dict.txt.big")
 jieba_fast.set_dictionary(big_dict)
@@ -174,6 +182,7 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
         if start_line:
             for x in range(start_line):
                 next(f)
+
         for line_raw in f:
             line = line_raw.strip()
             if line.startswith("#"):
@@ -193,8 +202,14 @@ def simple_write(pos_file, neg_file, start_line=0, mode='a', pos_result=pos_resu
         if start_line:
             for x in range(start_line):
                 next(f)
+        isNTUSD = os.path.basename(neg_file).startswith("NTUSD")
         for line_raw in f:
             line =line_raw.strip()
+            if isNTUSD and line.startswith("使"):
+                continue
+            if isNTUSD and line.find("..") != -1:
+                neg_sentences.add(line)
+                continue
             if line.startswith("#"):
                 continue
             if re.search("[你我他]|自己", line) and len(line) > 4:

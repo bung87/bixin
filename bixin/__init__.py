@@ -8,6 +8,10 @@ import math
 import pickle
 from collections import Counter
 # from decimal import Decimal
+from jieba_fast import default_logger
+
+default_logger.disabled = True
+
 big_dict = os.path.join(os.path.dirname(__file__), "data","dict.txt.big")
 jieba_fast.set_dictionary(big_dict)
 
