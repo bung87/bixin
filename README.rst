@@ -19,13 +19,10 @@ Usage
 
 Accuracy
 ========
-Test with 4091 taged corpus mixed up with shopping comments and Sina Weibo tweets
-
-accuracy: **0.842130**
 
 Test with 6226 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets 、hotel reviews 、news and financial news
 
-accuracy: **0.829534**
+accuracy: **0.825974**
 
 **Notice**:neutral texts are all ignored.
 
