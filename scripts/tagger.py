@@ -97,6 +97,7 @@ with open(os.path.join(maintained_dir, "neg.txt")) as f:
 with open(os.path.join(maintained_dir, "stopwords.txt")) as f:
     stop_words = set([x.strip() for x in f])
 
+vocs = set(jieba_fast.dt.FREQ.keys())
 
 def clean_words(s):
     text = re.sub(r'&#\d+;', "", s.strip())
@@ -130,6 +131,10 @@ def clean_words(s):
         if  content in stop_words:
             return None
         return content
+    elif words[0].word == "使":
+        left_words = "".join([x.word for x in words[1:]])
+        if left_words in vocs:
+            return left_words
     elif all(y == list(words[0])[1] for x, y in words):
         return None
 
