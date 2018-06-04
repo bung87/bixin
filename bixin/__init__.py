@@ -63,12 +63,12 @@ class Classifier():
         self.least_degree = set(degrees.get("5"))
         self.neg_degree = set(degrees.get("6")).union(negations)
 
-        # all_dgrees = self.most_degree\
-        #     .union(self.very_degree)\
-        #     .union(self.more_degree)\
-        #     .union(self.ish_degree)\
-        #     .union(self.least_degree)\
-        #     .union(self.neg_degree)\
+        self.all_degrees = self.most_degree\
+            .union(self.very_degree)\
+            .union(self.more_degree)\
+            .union(self.ish_degree)\
+            .union(self.least_degree)
+            # .union(self.neg_degree)\
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
         jieba_fast.load_userdict(pos_neg.union(pos_neg_eva))
@@ -152,31 +152,35 @@ class Classifier():
                 debug and print("%s neg" % word)
                 word_scored.add(word_mark)
             # 判断程度词
-            if index - 1 >= 0:
-                con = (pre2_word in self.more_degree)
-                if pre_word in self.more_degree or con:
-                    word_score = word_score * (FIXED_PA + 0.3)
-                elif pre_word in self.ish_degree or con:
-                    word_score = word_score * (FIXED_PA + 0.2)
-                elif pre_word in self.very_degree or con:
-                    word_score = word_score * (FIXED_PA + 0.4)
-                elif pre_word in self.least_degree or con:
-                    word_score = word_score * (FIXED_PA + 0.1)
-                elif pre_word in self.most_degree or con:
-                    word_score = word_score * (FIXED_PA + 0.5)
+            if index - 1 >= 0 and word_score != 0:
+                word_set = set([pre_word])
+                if pre2_word:
+                    word_set.add(pre2_word)
+                has_degree = word_set.intersection(self.all_degrees)
+                if has_degree:
+                    if word_set.intersection(self.more_degree) :
+                        word_score = word_score * (FIXED_PA + 0.3)
+                    elif  word_set.intersection(self.ish_degree) :
+                        word_score = word_score * (FIXED_PA + 0.2)
+                    elif  word_set.intersection(self.very_degree ):
+                        word_score = word_score * (FIXED_PA + 0.4)
+                    elif  word_set.intersection(self.least_degree) :
+                        word_score = word_score * (FIXED_PA + 0.1)
+                    elif  word_set.intersection(self.most_degree) :
+                        word_score = word_score * (FIXED_PA + 0.5)
 
             if word_score > 0:
-                if debug:
-                    pos_dict['words'].append(word)
-                    pos_dict['index'].append(index)
-                    pos_dict['times'] += 1
+                # if debug:
+                    # pos_dict['words'].append(word)
+                    # pos_dict['index'].append(index)
+                    # pos_dict['times'] += 1
                 pos_dict['score'] += word_score
                 # pos_dict['scores'].append(word_score)
             elif word_score < 0:
-                if debug:
-                    neg_dict['words'].append(word)
-                    neg_dict['index'].append(index)
-                    neg_dict['times'] += 1
+                # if debug:
+                    # neg_dict['words'].append(word)
+                    # neg_dict['index'].append(index)
+                    # neg_dict['times'] += 1
                 neg_dict['score'] += word_score
                 # neg_dict['scores'].append(word_score)
 
