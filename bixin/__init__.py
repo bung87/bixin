@@ -118,6 +118,8 @@ class Classifier():
             word_score = 0
             pre_word = index - 1 >= 0 and word_list[index - 1]
             pre2_word = index - 2 >= 0 and word_list[index - 2]
+            pre_word_neg = pre_word in self.neg_degree
+            pre2_word_neg = pre2_word in self.neg_degree
             base_score = math.log1p(counter[word])
             # 判断极性
             if (word in self.pos_evaluation) or (word in self.pos_emotion) :
@@ -131,7 +133,7 @@ class Classifier():
                 2. 不是 很 好吃
                 需要极性反转
                 '''
-                if (pre_word in self.neg_degree) or (pre2_word in self.neg_degree):
+                if pre_word_neg or pre2_word_neg:
                     word_score = base_score * -1
                 debug and print("%s pos" % word)
                 word_scored.add(word_mark)
@@ -145,7 +147,7 @@ class Classifier():
                 2. 不是 很 不好
                 极性反转
                 '''
-                if (pre_word in self.neg_degree) or (pre2_word in self.neg_degree):
+                if pre_word_neg or pre2_word_neg:
                     word_score = base_score * -1
                 debug and print("%s neg" % word)
                 word_scored.add(word_mark)
