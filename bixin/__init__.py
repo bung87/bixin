@@ -1,41 +1,21 @@
 # -*- coding: utf-8 -*-
 import re
 import os
-# import jieba_fast.posseg as pseg
-import jieba_fast
-# from functools import lru_cache
 import math
 import pickle
 from collections import Counter
-# from decimal import Decimal
-from jieba_fast import default_logger
-
-default_logger.disabled = True
+from cppjieba_py import Tokenizer
 
 big_dict = os.path.join(os.path.dirname(__file__), "data","dict.txt.big")
-jieba_fast.set_dictionary(big_dict)
+tokenizer = Tokenizer(big_dict)
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "dict.pkl")
 
 FIXED_PA = 1.6
 
-# @lru_cache(maxsize=None)
-
-
 def load_data():
     with open(DATA_PATH, "rb") as f:
         return pickle.load(f)
-
-# def norm(trr):
-#     if not trr:
-#         return trr
-#     base = min(trr)
-#     all_same = all(x == trr[0] for x in trr)
-#     if all_same:
-#         return [trr[0]]
-#     ranges = max(trr) - base
-#     normalized = [(x-base)/(ranges) for x in trr]
-#     return normalized
 
 class Classifier():
     def __init__(self, *args):
@@ -71,8 +51,8 @@ class Classifier():
             # .union(self.neg_degree)\
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
-        jieba_fast.load_userdict(pos_neg.union(pos_neg_eva))
-        jieba_fast.initialize()
+        tokenizer.load_userdict(pos_neg.union(pos_neg_eva))
+        # tokenizer.initialize()
 
         self.initialized = True
 
@@ -106,7 +86,7 @@ class Classifier():
         if not text_len:
             return 0
         word_list = list(filter(lambda x: re.match("\w", x),
-                                jieba_fast.cut(news)))
+                                tokenizer.cut(news)))
         if not word_list:
             return 0
         word_scored = set()
@@ -209,10 +189,10 @@ def predict(x, include_evalution_dict=False,include_tc=False,debug=False):
 
 def cut(*args,**argv):
     if predict.classifier.initialized:
-        return jieba_fast.cut(*args,**argv)
+        return tokenizer.cut(*args,**argv)
     else:
         predict.classifier.initialize()
-        return jieba_fast.cut(*args,**argv)
+        return tokenizer.cut(*args,**argv)
 
 
 predict.classifier = Classifier()

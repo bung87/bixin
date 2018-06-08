@@ -3,14 +3,10 @@
 import os
 import sys
 import re
-import jieba_fast
-# import jieba_fast.posseg as pseg
 import json
 from time import time
 from math import log2
-from jieba_fast import default_logger
-
-default_logger.disabled = True
+import cppjieba_py as tokenizer
 aaa = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(aaa)
 from bixin import Classifier, load_data, predict
@@ -42,9 +38,8 @@ def bare_dict():
 
     # with open(os.path.join(DATA_DIR, 'neg_eva.txt')) as f:
     #     neg_envalute = set([x.strip() for x in f.readlines()])
-    # jieba_fast.enable_parallel(4)
     # places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
-    # jieba_fast.load_userdict(places)
+    # tokenizer.load_userdict(places)
 
     # with open(os.path.join(DATA_DIR, 'pos_sentence.txt')) as f1,\
     #         open(os.path.join(DATA_DIR, 'neg_sentence.txt')) as f2:
@@ -54,7 +49,7 @@ def bare_dict():
     #     neg_emotion.union(s2)
     pos_neg = pos_emotion.union(neg_emotion)
     # pos_neg_eva = pos_envalute.union(neg_envalute)
-    jieba_fast.load_userdict(pos_neg)
+    tokenizer.load_userdict(pos_neg)
 
 
 _suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
@@ -71,7 +66,7 @@ def file_size(size):
 
 
 if __name__ == "__main__":
-    # jieba_fast.initialize()
+    # tokenizer.initialize()
     predict.classifier.initialize(include_tc=True)
 
     t1 = time()

@@ -22,7 +22,7 @@ Accuracy
 
 Test with 6226 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets 、hotel reviews 、news and financial news
 
-accuracy: **0.828339**
+accuracy: **0.810820**
 
 **Notice**:neutral texts are all ignored.
 
