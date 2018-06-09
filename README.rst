@@ -31,7 +31,7 @@ details about dataset `https://github.com/bung87/bixin/wiki <https://github.com/
 Development
 ===========
 
-``> pip3 install -e git+https://github.com/bung87/bixin``
+``> pip3 install -e ".[dev]" git+https://github.com/bung87/bixin``
 
 
 .. code-block::

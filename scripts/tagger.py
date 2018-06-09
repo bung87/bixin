@@ -4,22 +4,13 @@ import os
 import sys
 import re
 import json
-import jieba_fast
-import jieba_fast.posseg as pseg
+from cppjieba_py import Tokenizer
 from prefixtree import PrefixSet
 import subprocess
-from jieba_fast import default_logger
-from jieba import default_logger as default_logger2
-
-default_logger.disabled = True
-default_logger.propagate = False
-
-default_logger2.disabled = True
-default_logger2.propagate = False
 
 big_dict = os.path.join(os.path.dirname(__file__), "..", "bixin","data","dict.txt.big")
-jieba_fast.set_dictionary(big_dict)
-jieba_fast.initialize()
+tokenizer = Tokenizer(big_dict)
+
 
 DICTIONARIES_DIR = os.path.join(
     os.path.dirname(__file__), "..", "dictionaries")
@@ -46,7 +37,7 @@ neg_sentences = set()
 places = os.path.join(os.path.dirname(__file__), "../dictionaries/places.txt")
 
 with open(places) as f:
-    jieba_fast.load_userdict(f)
+    tokenizer.load_userdict(f)
 
     for line in f:
         s = line.strip().split()[0]
@@ -105,8 +96,6 @@ with open(os.path.join(maintained_dir, "neg.txt")) as f:
 with open(os.path.join(maintained_dir, "stopwords.txt")) as f:
     stop_words = set([x.strip() for x in f])
 
-vocs = set(jieba_fast.dt.FREQ.keys())
-
 def clean_words(s):
     text = re.sub(r'&#\d+;', "", s.strip())
     text = re.sub(r'[:：？。，\.#·、…]+$', "", text)
@@ -118,7 +107,7 @@ def clean_words(s):
         return None
     # elif re.match(r'\w[^\s\w]$',text): #they are 哼！干！呢！瘾？唉！醇? 醇？弇?
     #     return None
-    words = list(pseg.cut(text))
+    words = list(tokenizer.tag(text))
     text_len = len(text)
     words_len = len(words)
 
@@ -143,7 +132,7 @@ def clean_words(s):
         left_words = "".join([x.word for x in words[1:]])
         if left_words in stop_words:
             return None
-        if left_words in vocs:
+        if tokenizer.find(left_words):
             return left_words
     # elif words[-1].word in ["的","地"]:
     #     left_words = "".join([x.word for x in words[:-1]])
@@ -172,7 +161,7 @@ def clean_words(s):
 #         the_words = "".join(_words[1:])
 #
 #     if the_words:
-#         words = list(pseg.cut(the_words))
+#         words = list(tokenizer.tag(the_words))
 #         text_len = len(the_words)
 #         words_len = len(words)
 
@@ -423,8 +412,8 @@ with open(polarity_table) as f,\
         pos_sent = cols[1]
         neg_sent = cols[0]
 
-        pos_words = list(pseg.cut(pos_sent)) if pos_sent else None
-        neg_words = list(pseg.cut(neg_sent)) if neg_sent else None
+        pos_words = list(tokenizer.tag(pos_sent)) if pos_sent else None
+        neg_words = list(tokenizer.tag(neg_sent)) if neg_sent else None
 
         pos_words and multi_write(pos_words, pos, pos_sentence,"pos")
         neg_words and multi_write(neg_words, neg, neg_sentence,"neg")
