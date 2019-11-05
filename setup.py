@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from setuptools import setup, find_packages
-
+import io
 install_requires = ["cppjieba-py"]
 extras_require = {
         'dev': ['prefixtree>=0.2.5', 'chardet>=3.0.4','opencc-python-reimplemented>=0.1.3'],
@@ -15,6 +15,8 @@ setup(
     package_data={
         'bixin.data': ['*.pkl']
     },
+    long_description= io.open("README.md",'r', encoding="utf-8").read(),
+    long_description_content_type='text/markdown',
     test_suite = 'tests',
     extras_require=extras_require,
     install_requires=install_requires
