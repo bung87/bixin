@@ -5,6 +5,7 @@ import math
 import pickle
 from collections import Counter
 from cppjieba_py import Tokenizer
+import tempfile
 
 big_dict = os.path.join(os.path.dirname(__file__), "data","dict.txt.big")
 tokenizer = Tokenizer(big_dict)
@@ -18,10 +19,10 @@ def load_data():
         return pickle.load(f)
 
 class Classifier():
-    def __init__(self, *args):
+    def __init__(self, *args,**argv):
         self.initialized = False
         if len(args):
-            self._initialize(*args)
+            self.initialize(*args,**argv)
 
     def _initialize(self, pos_emotion, pos_evaluation, neg_emotion, neg_evaluation, degrees, negations):
         self.pos_emotion = pos_emotion
@@ -34,8 +35,7 @@ class Classifier():
         else:
             self.pos_evaluation = self.pos_emotion
             self.neg_evaluation = self.neg_emotion
-        # self.negations = negations
-        # self.degrees = degrees
+
         self.most_degree = set(degrees.get("1"))
         self.very_degree = set(degrees.get("2"))
         self.more_degree = set(degrees.get("3"))
@@ -48,11 +48,12 @@ class Classifier():
             .union(self.more_degree)\
             .union(self.ish_degree)\
             .union(self.least_degree)
-            # .union(self.neg_degree)\
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
-        tokenizer.load_userdict(pos_neg.union(pos_neg_eva))
-        # tokenizer.initialize()
+        # @TODO fix
+        # with tempfile.NamedTemporaryFile(suffix=".txt",mode="w",encoding="utf-8") as f:
+        #     f.write("\n".join(pos_neg.union(pos_neg_eva)))
+        #     tokenizer.load_userdict(f.name)
 
         self.initialized = True
 
@@ -170,12 +171,7 @@ class Classifier():
         all_sum = pos_sum + abs(neg_sum)
         if all_sum == 0:
             return 0
-        # aa = norm(pos_dict['scores'])
-        # bb = norm(neg_dict['scores'])
-        # len_a = len(aa) or 1
-        # len_b = len(bb) or 1
-        # r = math.fsum(aa)/len_a -  abs(math.fsum(bb)/len_b)
-        # print( r )
+
         r = (pos_sum + neg_sum) /all_sum
         return float(format(r,".2f"))
 

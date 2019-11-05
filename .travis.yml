@@ -1,0 +1,18 @@
+language: python
+python:
+- '2.7'
+- '3.5'
+- '3.6'
+- '3.7'
+sudo: false
+
+install:
+- pip install ".[test]"
+script:
+- tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: __token__
+  password: LnMOJ6QZTiwL8c1GccRFFSN5GjPofqerwXkwidfR25Cc3xUktQtktg0y+CL6wwciXUyZx0/XmB/7t6/zky+46HSqMs4fqGg4p1VukAZMQMPDH8jMH75Ll0YgijyA+lHzoGYswnDUD0fggsYyeIFIR5WB93ojZaZ//X2w6SF/XpTYgDaDxyqS99rOoWkaZBvCw17nIGl30euwF5rHmw6O83UXYGpnx8fYJQFI9CtoGrIxjHQu8p8z+XCvhO1HrncCNy106FklQkDKTdGjprtxhb75aRI7DTDNQI1EZXzKnDN1LHMwb7SwpXmpOk+yx0uQrkwW0gADd2vjMfghyJIMOgx3puzOBAOhReaYjgNZi6ClHkNj8X2N0flROCbV3UvdKBx/X4saqO3bAjVr6ZvMsQapTvJgzijLBtZbypkEXmj+kQT2D/jpHuQhVgJ0d35zeAhMCmM7X/20L5g9ibMwLj2KlrYUEVVp31g+dwyVl13lDkmsRZ+dVyFfFSHRLQBBkuufKFQYNEkBBt7nJ507OlaRDmaU7emf5V5dfzakgv+Z2rpWubHZOJiYn5Q9wYP+QeRL3zBk3AkkYMui3dIMuQ/4g9nbHReRmnuichbfEpbvPODGBAmpDxtwVGPIgha97VbnZzVcu3rI12SMhob52+klzN6kNr9Kylsy/AHRe7o=
+  skip_existing: true
