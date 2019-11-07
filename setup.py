@@ -5,7 +5,7 @@ import io
 install_requires = ["jieba_fast>=0.53"]
 extras_require = {
         'dev': ['prefixtree>=0.2.5', 'chardet>=3.0.4','opencc-python-reimplemented>=0.1.3'],
-        'test': ['spec>=1.4.1','nose>=1.3.7']
+        'test': ['spec>=1.4.1','nose>=1.3.7','tox>=3.14.0']
     }
 setup(
     name='bixin',
