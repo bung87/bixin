@@ -6,7 +6,7 @@ import re
 import json
 from time import time
 from math import log2
-import cppjieba_py as tokenizer
+import jieba_fast as tokenizer
 aaa = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(aaa)
 from bixin import Classifier, load_data, predict

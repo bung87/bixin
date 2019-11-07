@@ -4,7 +4,7 @@ import os
 import math
 import pickle
 from collections import Counter
-from cppjieba_py import Tokenizer
+from jieba_fast import Tokenizer
 import tempfile
 
 big_dict = os.path.join(os.path.dirname(__file__), "data","dict.txt.big")

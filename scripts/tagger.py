@@ -4,7 +4,7 @@ import os
 import sys
 import re
 import json
-from cppjieba_py import Tokenizer
+from jieba_fast import Tokenizer
 from prefixtree import PrefixSet
 import subprocess
 

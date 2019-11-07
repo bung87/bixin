@@ -1,6 +1,6 @@
 import os
 import sys
-from cppjieba_py import Tokenizer
+from jieba_fast import Tokenizer
 
 big_dict = os.path.join(os.path.dirname(__file__), "..", "bixin", "data", "dict.txt.big")
 tokenizer = Tokenizer(big_dict)
