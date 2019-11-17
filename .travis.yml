@@ -1,26 +1,16 @@
 language: python
 python:
-- '2.7'
 - '3.5'
 - '3.6'
 - '3.7'
 sudo: false
-# before_install:
-# - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-# - sudo apt-get -y update
-# - sudo apt-get -y install build-essential
-# - sudo apt-get -y install g++-5
-# - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
-# - g++ --version
 install:
 - pip install ".[test]"
 script:
 - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
 deploy:
-  # on:
-  #   tags: true
   provider: pypi
-  distributions: sdist 
+  distributions: sdist
   user: __token__
-  password: LnMOJ6QZTiwL8c1GccRFFSN5GjPofqerwXkwidfR25Cc3xUktQtktg0y+CL6wwciXUyZx0/XmB/7t6/zky+46HSqMs4fqGg4p1VukAZMQMPDH8jMH75Ll0YgijyA+lHzoGYswnDUD0fggsYyeIFIR5WB93ojZaZ//X2w6SF/XpTYgDaDxyqS99rOoWkaZBvCw17nIGl30euwF5rHmw6O83UXYGpnx8fYJQFI9CtoGrIxjHQu8p8z+XCvhO1HrncCNy106FklQkDKTdGjprtxhb75aRI7DTDNQI1EZXzKnDN1LHMwb7SwpXmpOk+yx0uQrkwW0gADd2vjMfghyJIMOgx3puzOBAOhReaYjgNZi6ClHkNj8X2N0flROCbV3UvdKBx/X4saqO3bAjVr6ZvMsQapTvJgzijLBtZbypkEXmj+kQT2D/jpHuQhVgJ0d35zeAhMCmM7X/20L5g9ibMwLj2KlrYUEVVp31g+dwyVl13lDkmsRZ+dVyFfFSHRLQBBkuufKFQYNEkBBt7nJ507OlaRDmaU7emf5V5dfzakgv+Z2rpWubHZOJiYn5Q9wYP+QeRL3zBk3AkkYMui3dIMuQ/4g9nbHReRmnuichbfEpbvPODGBAmpDxtwVGPIgha97VbnZzVcu3rI12SMhob52+klzN6kNr9Kylsy/AHRe7o=
+  password: d8lAVS/lxL3qeq/Vxk+oxXlbEQhk5Iu//jclsgQugoUqjbutjJzt8Lfv4wvXxXzPC3konGghqMDypsft1oJUbqu8EgNoeVSVkNSWncJThPeRe5ZK+RaOcvhGxe7vv2dx/o/LqPgY5x6IqBIsqVnI6FTjWJgtQ2jOThvHD59zwGBP0yJHLu2sfUh/AhhJKjYwp3/qhAB5S3C5dK5kXTb14NiR4wA/lqreZyUymko6wUukD/1WJrJniALqjLNDCJyf7kQZ4eqfiJ8QeCvmHBODqr1SY7CVgCp0rtaJ/ZJgjxp0dpph+HUaauxRTRujSShgy76rtf+jDVqG1mcYHaaJQUYC/n8MrqZhrvFAFJd4g9Lrus76La8mfj8mrWxgcGdcqEgHm1NhVDfSEy83dV7di1rFnq89hD42vz+vBnvxX5aJhh0fwy6lRtuPQhGeW6lMkhphE8VzrNt1y7g7udwT/thO2XjZzBZDuu6+OOum8mukNghSy2j6cnLDQyrLPD/TxmVI+hDw2QWGCXiTXf+LCaVy5uoZbtKrCDnCKB9ZmVMfSUXXcKLGCN2InWQPRqPX4J8/9uMiw/iMquVOGOVZLsr8jRUX26GEn6u9v/kSsfds7pWn0kLfXwwuBc9ZSC3jmfmd2HtuUpQXAGEX5/L20x2FQt4rZYSKYK1DURRA+XU=
   skip_existing: true
