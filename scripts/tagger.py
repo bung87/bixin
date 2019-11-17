@@ -7,6 +7,8 @@ import json
 from jieba_fast import Tokenizer
 from prefixtree import PrefixSet
 import subprocess
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+subprocess.check_call(["tar","-xzf","dictionaries.tar.gz","-C",root])
 
 big_dict = os.path.join(os.path.dirname(__file__), "..", "bixin","data","dict.txt.big")
 tokenizer = Tokenizer(big_dict)
