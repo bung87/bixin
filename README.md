@@ -44,7 +44,7 @@ details about test dataset see wiki [关于测试数据集](https://github.com/b
     
 ``./scripts/score.py``
 
-all data archives: `https://github.com/bung87/bixin/releases/tag/v0.0.1 <https://github.com/bung87/bixin/releases/tag/v0.0.1>`_
+all data archives: [https://github.com/bung87/bixin/releases/tag/v0.0.1](https://github.com/bung87/bixin/releases/tag/v0.0.1)
 
 run accuray testing with all .txt files under **test_data** directory sentence per line end with a space and a tag **n** or **p**
 
