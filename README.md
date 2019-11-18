@@ -1,15 +1,14 @@
-bixin
-=====
+# bixin
+
 [![Build Status](https://travis-ci.org/bung87/bixin.svg?branch=master)](https://travis-ci.org/bung87/bixin) [![PyPI](https://img.shields.io/pypi/v/bixin.svg)](https://pypi.python.org/pypi/bixin)  
 
 Chinese Sentiment Analysis base on dictionary and rules.
 
-Installation
-============
-``> pip3 install git+https://github.com/bung87/bixin``
+## Installation
 
-Usage
-=====
+`> pip3 install bixin`
+
+## Usage
     
 ```python
     from bixin import predict
@@ -22,8 +21,7 @@ sentiment score is in the range of -1 to 1
 
 ``predict`` will load dictionary data at first time,to load it manually use ``predict.classifier.initialize()``
 
-Accuracy
-========
+## Accuracy
 
 Test with 6226 taged corpus mixed up with  shopping reviews 、Sina Weibo tweets 、hotel reviews 、news and financial news
 
@@ -31,10 +29,9 @@ accuracy: **0.827771**
 
 **Notice**:neutral texts are all ignored.
 
-details about dataset `https://github.com/bung87/bixin/wiki <https://github.com/bung87/bixin/wiki>`_
+details about test dataset see wiki [关于测试数据集](https://github.com/bung87/bixin/wiki/%E5%85%B3%E4%BA%8E%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E9%9B%86)
 
-Development
-===========
+## Development
 
 ``> pip3 install -e ".[dev]" git+https://github.com/bung87/bixin``
 
@@ -51,7 +48,15 @@ all data archives: `https://github.com/bung87/bixin/releases/tag/v0.0.1 <https:/
 
 run accuray testing with all .txt files under **test_data** directory sentence per line end with a space and a tag **n** or **p**
 
-Test
-===========
+## Test
+
 `nosetests -c nose.cfg` for single python version  
 `tox` for multiple python versions
+
+## Acknowledgments
+
+bixin was inspired by [dongyuanxin](https://github.com/dongyuanxin/)'s [DictEmotionAlgorithm](https://github.com/dongyuanxin/various-codes/blob/master/DictEmotionAlgorithm/Main.py)
+
+## License
+
+MIT © [bung](http://www.bungos.me)
