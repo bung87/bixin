@@ -10,6 +10,8 @@ extras_require = {
 setup(
     name='bixin',
     version='0.0.5',
+    license="MIT",
+    author="bung",
     packages=find_packages(exclude=['bin', 'tests']),
     include_package_data=True,
     package_data={
