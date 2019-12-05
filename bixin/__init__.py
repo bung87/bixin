@@ -50,10 +50,9 @@ class Classifier():
             .union(self.least_degree)
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
-        # @TODO fix
-        # with tempfile.NamedTemporaryFile(suffix=".txt",mode="w",encoding="utf-8") as f:
-        #     f.write("\n".join(pos_neg.union(pos_neg_eva)))
-        #     tokenizer.load_userdict(f.name)
+        with tempfile.NamedTemporaryFile(suffix=".txt",mode="w",encoding="utf-8") as f:
+            f.write("\n".join(pos_neg.union(pos_neg_eva)))
+            tokenizer.load_userdict(f.name)
 
         self.initialized = True
 

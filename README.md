@@ -3,6 +3,16 @@
 [![Build Status](https://travis-ci.org/bung87/bixin.svg?branch=master)](https://travis-ci.org/bung87/bixin) [![PyPI](https://img.shields.io/pypi/v/bixin.svg)](https://pypi.python.org/pypi/bixin)  
 
 Chinese Sentiment Analysis base on dictionary and rules.
+## CHANGELOG
+
+prior to v0.0.4, bixin depends on `cppjieba-py`, which requires a c++ 11 compillation makes hard to use, I decided to use `jieba_fast`.  
+
+it will solve the following problems:  
+ * hard to install the dependency `cppjieba-py`
+ * can't load user dictionary
+ * word segment difference from `jieba`
+
+but it slower than use `cppjieba-py`  
 
 ## Installation
 
