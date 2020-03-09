@@ -6,6 +6,9 @@ import pickle
 from collections import Counter
 from jieba_fast import Tokenizer
 import tempfile
+# import platform
+
+# isWin = platform.system() == 'Windows'
 
 big_dict = os.path.join(os.path.dirname(__file__), "data","dict.txt.big")
 tokenizer = Tokenizer(big_dict)
@@ -50,10 +53,11 @@ class Classifier():
             .union(self.least_degree)
 
         pos_neg = self.pos_emotion.union(self.neg_emotion)
-        with tempfile.NamedTemporaryFile(suffix=".txt",mode="w",encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile(suffix=".txt",mode="w",encoding="utf-8",delete=False) as f:
             f.write("\n".join(pos_neg.union(pos_neg_eva)))
+            f.close() # for Win
             tokenizer.load_userdict(f.name)
-
+        os.unlink(f.name) # for Win
         self.initialized = True
 
     def initialize(self,include_evalution_dict=False,include_tc=False):
