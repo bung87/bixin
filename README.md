@@ -69,6 +69,8 @@ bixin was inspired by [dongyuanxin](https://github.com/dongyuanxin/)'s [DictEmot
 
 ## Support me
 
+支付宝：
+
 <img src="https://user-images.githubusercontent.com/2238294/234182860-ada63730-3778-4ebf-9351-5c8df82f01a3.jpg" alt="支付宝" width="250"/>
 
 ## License
